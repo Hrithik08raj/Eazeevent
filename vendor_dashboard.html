@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Vendor Dashboard | Eazeevent</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="css/global.css" />
+    <script src="js/vendor_dashboard.js" defer></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#004c4c",
+                        "accent-gold": "#D4AF37",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0f2323",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+
+<body
+    class="font-display bg-background-light dark:bg-background-dark text-[#101818] dark:text-white antialiased h-screen flex overflow-hidden transition-colors duration-300">
+
+    <div id="sidebarOverlay"
+        class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-sm transition-opacity opacity-0 md:hidden"></div>
+
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 w-64 bg-white dark:bg-[#102a2a] border-r border-[#e0e8e8] dark:border-[#1d3a3a] flex flex-col transition-transform duration-300 z-50">
+        <div
+            class="h-20 flex items-center justify-between px-6 border-b border-[#e0e8e8] dark:border-[#1d3a3a] shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="text-primary dark:text-accent-gold">
+                    <img src="Eazeevent_img.jpeg" alt="Eazeevent Logo"
+                        class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-700">
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight text-primary dark:text-white">Eazeevent</h1>
+                    <p class="text-[10px] text-accent-gold font-bold uppercase tracking-widest">Vendor Profile</p>
+                </div>
+            </div>
+            <button id="closeSidebarBtn" class="md:hidden text-[#5e8d8d] hover:text-red-500 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <nav id="navMenu" class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <a href="#"
+                class="nav-link active-nav flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors"
+                data-page="dashboard">
+                <span class="material-symbols-outlined">dashboard</span>Dashboard
+            </a>
+            <a href="#"
+                class="nav-link flex items-center gap-3 px-4 py-3 text-[#5e8d8d] hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-white rounded-xl font-semibold transition-colors"
+                data-page="inquiries">
+                <span class="material-symbols-outlined">inbox</span>Inquiries
+                <span id="inquiryBadge"
+                    class="ml-auto bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">3</span>
+            </a>
+            <a href="#"
+                class="nav-link flex items-center gap-3 px-4 py-3 text-[#5e8d8d] hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-white rounded-xl font-semibold transition-colors"
+                data-page="bookings">
+                <span class="material-symbols-outlined">calendar_month</span>Bookings
+            </a>
+            <a href="#"
+                class="nav-link flex items-center gap-3 px-4 py-3 text-[#5e8d8d] hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-white rounded-xl font-semibold transition-colors"
+                data-page="profile">
+                <span class="material-symbols-outlined">storefront</span>My Profile
+            </a>
+            <a href="#"
+                class="nav-link flex items-center gap-3 px-4 py-3 text-[#5e8d8d] hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-white rounded-xl font-semibold transition-colors"
+                data-page="earnings">
+                <span class="material-symbols-outlined">account_balance_wallet</span>Earnings
+            </a>
+            <a href="#"
+                class="nav-link flex items-center gap-3 px-4 py-3 text-[#5e8d8d] hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-white rounded-xl font-semibold transition-colors"
+                data-page="ai-marketing">
+                <span class="material-symbols-outlined">auto_awesome</span>AI Marketing
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-[#e0e8e8] dark:border-[#1d3a3a]">
+            <a href="#"
+                class="flex items-center gap-3 px-4 py-3 text-[#5e8d8d] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl font-semibold transition-colors"
+                id="logoutBtn">
+                <span class="material-symbols-outlined">logout</span>Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+
+        <header
+            class="h-20 bg-white dark:bg-[#102a2a] border-b border-[#e0e8e8] dark:border-[#1d3a3a] flex items-center justify-between px-6 shrink-0 transition-colors duration-300">
+            <div class="flex items-center gap-4">
+                <button id="mobileMenuBtn"
+                    class="md:hidden text-[#5e8d8d] hover:text-primary dark:hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-2xl mt-1">menu</span>
+                </button>
+                <h2 id="pageTitle" class="text-xl font-bold hidden sm:block">Overview</h2>
+            </div>
+            <div class="flex items-center gap-3">
+                <div id="statusToggle"
+                    class="hidden sm:flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-full border border-green-200 dark:border-green-800 cursor-pointer select-none transition-all hover:opacity-80 shadow-sm"
+                    title="Toggle Status">
+                    <div id="statusDot" class="size-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span id="statusText"
+                        class="text-[10px] font-bold text-green-700 dark:text-green-400 uppercase tracking-widest">Accepting
+                        Leads</span>
+                </div>
+                <div class="h-6 w-px bg-[#d1dada] dark:bg-[#2a4a4a] hidden sm:block"></div>
+                <button id="themeToggle"
+                    class="p-2 text-[#5e8d8d] hover:text-primary dark:hover:text-accent-gold transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-white/5">
+                    <span class="material-symbols-outlined" id="themeIcon">dark_mode</span>
+                </button>
+                <div class="relative">
+                    <button id="notifBtn"
+                        class="relative p-2 text-[#5e8d8d] hover:text-primary dark:hover:text-accent-gold transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-white/5">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span id="notifDot"
+                            class="absolute top-1 right-1 size-2.5 bg-red-500 border-2 border-white dark:border-[#102a2a] rounded-full"></span>
+                    </button>
+                    <div id="notifMenu"
+                        class="hidden absolute top-full mt-4 right-0 w-80 bg-white dark:bg-[#1d3a3a] rounded-xl shadow-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] overflow-hidden z-50">
+                        <div
+                            class="p-4 border-b border-[#e0e8e8] dark:border-[#2a4a4a] flex items-center justify-between">
+                            <h4 class="font-bold text-sm">Notifications</h4>
+                            <button class="text-xs text-primary dark:text-accent-gold font-bold hover:underline"
+                                id="markAllRead">Mark all read</button>
+                        </div>
+                        <div id="notifList"></div>
+                        <div class="p-4 text-center text-xs font-bold text-primary dark:text-accent-gold cursor-pointer hover:underline"
+                            onclick="navigateTo('inquiries')">View All Notifications</div>
+                    </div>
+                </div>
+                <div class="relative ml-1">
+                    <div id="profileBtn"
+                        class="flex items-center gap-3 pl-3 cursor-pointer border-l border-[#e0e8e8] dark:border-[#1d3a3a] hover:opacity-80 transition-opacity">
+                        <div id="headerAvatar"
+                            class="size-10 rounded-full avatar-placeholder border-2 border-primary/20 dark:border-accent-gold/50 shadow-sm text-sm">
+                            LF</div>
+                        <div class="hidden lg:block">
+                            <p id="headerProfileName" class="text-sm font-bold leading-tight">Lumiere Films</p>
+                            <p id="headerProfileCategory"
+                                class="text-[10px] text-[#5e8d8d] uppercase tracking-wider font-semibold">Photographer
+                            </p>
+                        </div>
+                        <span class="material-symbols-outlined text-[#5e8d8d] hidden lg:block">expand_more</span>
+                    </div>
+                    <div id="profileMenu"
+                        class="hidden absolute top-full mt-4 right-0 w-56 bg-white dark:bg-[#1d3a3a] rounded-xl shadow-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] overflow-hidden z-50 py-2">
+                        <a href="#"
+                            class="block px-4 py-2.5 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-[#2a4a4a]/50 hover:text-primary dark:hover:text-accent-gold transition-colors flex items-center gap-2"
+                            onclick="navigateTo('profile')">
+                            <span class="material-symbols-outlined text-[18px]">person</span> Public Profile
+                        </a>
+                        <a href="#"
+                            class="block px-4 py-2.5 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-[#2a4a4a]/50 hover:text-primary dark:hover:text-accent-gold transition-colors flex items-center gap-2"
+                            onclick="openSettingsModal()">
+                            <span class="material-symbols-outlined text-[18px]">settings</span> Settings
+                        </a>
+                        <div class="my-1 border-t border-[#e0e8e8] dark:border-[#2a4a4a]"></div>
+                        <a href="#" id="signOutBtn"
+                            class="block px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px]">logout</span> Sign out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10 scroll-smooth">
+            <div class="max-w-7xl mx-auto">
+
+                <div id="page-dashboard" class="page active space-y-8">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                        <div>
+                            <h2 id="dashWelcomeText"
+                                class="text-3xl font-black text-[#101818] dark:text-white tracking-tight">Welcome back,
+                                Lumiere! 👋</h2>
+                            <p class="text-[#5e8d8d] mt-1">Here's what's happening with your Eazeevent business today.
+                            </p>
+                        </div>
+                        <button
+                            class="bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 ripple"
+                            onclick="navigateTo('profile')">
+                            <span class="material-symbols-outlined text-[18px]">edit_square</span>Edit Profile
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white dark:bg-[#1d3a3a] p-6 rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm flex items-start justify-between group hover:border-primary/30 dark:hover:border-accent-gold/30 hover:shadow-md transition-all cursor-pointer"
+                            onclick="navigateTo('profile')">
+                            <div>
+                                <p class="text-sm font-semibold text-[#5e8d8d] mb-1">Total Profile Views</p>
+                                <h3 class="text-2xl font-black text-[#101818] dark:text-white">1,248</h3>
+                                <p class="text-xs font-bold text-green-500 mt-2 flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[14px]">trending_up</span> +12% this week
+                                </p>
+                            </div>
+                            <div
+                                class="size-12 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-[#1d3a3a] p-6 rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm flex items-start justify-between group hover:border-primary/30 dark:hover:border-accent-gold/30 hover:shadow-md transition-all cursor-pointer"
+                            onclick="navigateTo('inquiries')">
+                            <div>
+                                <p class="text-sm font-semibold text-[#5e8d8d] mb-1">New Inquiries</p>
+                                <h3 class="text-2xl font-black text-[#101818] dark:text-white" id="dashInquiryCount">14
+                                </h3>
+                                <p class="text-xs font-bold text-green-500 mt-2 flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[14px]">trending_up</span> +3 since
+                                    yesterday</p>
+                            </div>
+                            <div
+                                class="size-12 rounded-xl bg-accent-gold/10 text-accent-gold flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined">mark_email_unread</span>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-[#1d3a3a] p-6 rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm flex items-start justify-between group hover:border-primary/30 dark:hover:border-accent-gold/30 hover:shadow-md transition-all cursor-pointer"
+                            onclick="navigateTo('bookings')">
+                            <div>
+                                <p class="text-sm font-semibold text-[#5e8d8d] mb-1">Upcoming Events</p>
+                                <h3 class="text-2xl font-black text-[#101818] dark:text-white">5</h3>
+                                <p class="text-xs font-bold text-[#5e8d8d] mt-2 flex items-center gap-1">Next event in 4
+                                    days</p>
+                            </div>
+                            <div
+                                class="size-12 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined">celebration</span>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-[#1d3a3a] p-6 rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm flex items-start justify-between group hover:border-primary/30 dark:hover:border-accent-gold/30 hover:shadow-md transition-all cursor-pointer"
+                            onclick="navigateTo('earnings')">
+                            <div>
+                                <p class="text-sm font-semibold text-[#5e8d8d] mb-1">Estimated Earnings</p>
+                                <h3 class="text-2xl font-black text-[#101818] dark:text-white" id="dashEarningsText">₹0</h3>
+                                <p class="text-xs font-bold text-[#5e8d8d] mt-2 flex items-center gap-1">For this month
+                                </p>
+                            </div>
+                            <div
+                                class="size-12 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined">account_balance_wallet</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-bold">Recent Inquiries</h3>
+                                <a href="#" class="text-sm font-bold text-primary dark:text-accent-gold hover:underline"
+                                    onclick="navigateTo('inquiries')">View All</a>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] overflow-hidden shadow-sm">
+                                <div
+                                    class="hidden md:grid grid-cols-12 gap-4 p-4 border-b border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a]/50 text-xs font-bold text-[#5e8d8d] uppercase tracking-wider">
+                                    <div class="col-span-4">Client</div>
+                                    <div class="col-span-3">Event Date</div>
+                                    <div class="col-span-3">Status</div>
+                                    <div class="col-span-2 text-right">Action</div>
+                                </div>
+                                <div id="dashboardInquiries"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div
+                                class="ai-gradient p-6 rounded-2xl text-white shadow-xl relative overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+                                <span
+                                    class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/10 rotate-12 pointer-events-none">auto_awesome</span>
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span
+                                        class="material-symbols-outlined text-accent-gold animate-pulse">tips_and_updates</span>
+                                    <h3 class="font-bold text-lg">Eazee AI Insight</h3>
+                                </div>
+                                <p class="text-sm text-white/90 leading-relaxed mb-6">Vendors who add a "Drone Coverage"
+                                    video to their portfolio see a <strong class="text-accent-gold">34%
+                                        increase</strong> in bookings for destination weddings.</p>
+                                <button
+                                    class="w-full bg-white text-primary font-bold py-2.5 rounded-xl hover:bg-gray-100 transition-all shadow-md active:scale-95 text-sm ripple"
+                                    onclick="navigateTo('ai-marketing')">Explore AI Marketing</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-inquiries" class="page space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black tracking-tight">Inquiries</h2>
+                            <p class="text-[#5e8d8d] mt-1">Manage all your client inquiries and leads.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <select id="inquiryFilter"
+                                class="text-sm border border-[#e0e8e8] dark:border-[#2a4a4a] bg-white dark:bg-[#1d3a3a] rounded-lg px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30">
+                                <option value="all">All Statuses</option>
+                                <option value="New Request">New Request</option>
+                                <option value="In Discussion">In Discussion</option>
+                                <option value="Booked">Booked</option>
+                                <option value="Declined">Declined</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] overflow-hidden shadow-sm">
+                        <div
+                            class="hidden md:grid grid-cols-12 gap-4 p-4 border-b border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a]/50 text-xs font-bold text-[#5e8d8d] uppercase tracking-wider">
+                            <div class="col-span-4">Client</div>
+                            <div class="col-span-2">Event Date</div>
+                            <div class="col-span-2">Location</div>
+                            <div class="col-span-2">Status</div>
+                            <div class="col-span-2 text-right">Action</div>
+                        </div>
+                        <div id="inquiriesList"></div>
+                    </div>
+                </div>
+
+                <div id="page-bookings" class="page space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-black tracking-tight">Bookings & Calendar</h2>
+                        <p class="text-[#5e8d8d] mt-1">Track all confirmed events and upcoming schedule.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1">
+                            <div
+                                class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6">
+                                <div class="flex items-center justify-between mb-6">
+                                    <button id="prevMonth"
+                                        class="p-2 hover:bg-gray-100 dark:hover:bg-[#102a2a] rounded-lg transition-colors"><span
+                                            class="material-symbols-outlined text-[#5e8d8d]">chevron_left</span></button>
+                                    <h3 id="calMonthYear" class="text-lg font-bold"></h3>
+                                    <button id="nextMonth"
+                                        class="p-2 hover:bg-gray-100 dark:hover:bg-[#102a2a] rounded-lg transition-colors"><span
+                                            class="material-symbols-outlined text-[#5e8d8d]">chevron_right</span></button>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1 mb-2">
+                                    <div class="text-center text-xs font-bold text-[#5e8d8d] py-2">Sun</div>
+                                    <div class="text-center text-xs font-bold text-[#5e8d8d] py-2">Mon</div>
+                                    <div class="text-center text-xs font-bold text-[#5e8d8d] py-2">Tue</div>
+                                    <div class="text-center text-xs font-bold text-[#5e8d8d] py-2">Wed</div>
+                                    <div class="text-center text-xs font-bold text-[#5e8d8d] py-2">Thu</div>
+                                    <div class="text-center text-xs font-bold text-[#5e8d8d] py-2">Fri</div>
+                                    <div class="text-center text-xs font-bold text-[#5e8d8d] py-2">Sat</div>
+                                </div>
+                                <div id="calGrid" class="grid grid-cols-7 gap-1"></div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2">
+                            <h3 class="text-xl font-bold mb-4">Upcoming Bookings</h3>
+                            <div class="space-y-4" id="bookingsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-profile" class="page space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black tracking-tight">My Profile</h2>
+                            <p class="text-[#5e8d8d] mt-1">Manage your public vendor listing and business details.</p>
+                        </div>
+                        <button id="saveProfileBtn"
+                            class="bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm hover:bg-primary/90 transition-all flex items-center gap-2 ripple">
+                            <span class="material-symbols-outlined text-[18px]">save</span>Save Changes
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div
+                                class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6 space-y-5">
+                                <h3 class="font-bold text-lg border-b border-[#e0e8e8] dark:border-[#2a4a4a] pb-4">
+                                    Business Information</h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-bold mb-2 text-[#5e8d8d]">Business Name</label>
+                                        <input type="text" id="profileBusinessName" value="Lumiere Films"
+                                            class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold mb-2 text-[#5e8d8d]">Category</label>
+                                        <select id="profileCategory"
+                                            class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition">
+                                            <option selected>Photographer</option>
+                                            <option>Videographer</option>
+                                            <option>DJ / Music</option>
+                                            <option>Decorator</option>
+                                            <option>Caterer</option>
+                                            <option>Venue</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold mb-2 text-[#5e8d8d]">Starting Price
+                                            (₹)</label>
+                                        <input type="number" id="profilePrice" value="50000"
+                                            class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold mb-2 text-[#5e8d8d]">City</label>
+                                        <input type="text" id="profileCity" value="Mumbai, Maharashtra"
+                                            class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold mb-2 text-[#5e8d8d]">Phone Number</label>
+                                        <input type="tel" id="profilePhone" value="+91 98765 43210"
+                                            class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold mb-2 text-[#5e8d8d]">Email</label>
+                                        <input type="email" id="profileEmail" value="lumiere@eazeevent.in"
+                                            class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold mb-2 text-[#5e8d8d]">Business
+                                        Description</label>
+                                    <textarea rows="4" id="profileDescription"
+                                        class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition resize-none">We are a premium wedding photography & videography studio based in Mumbai. Specializing in cinematic storytelling, candid photography, and destination weddings across India.</textarea>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6">
+                                <h3 class="font-bold text-lg border-b border-[#e0e8e8] dark:border-[#2a4a4a] pb-4 mb-4">
+                                    Portfolio</h3>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                                    <div
+                                        class="aspect-square rounded-xl bg-gradient-to-br from-teal-100 to-teal-200 dark:from-teal-900/30 dark:to-teal-800/30 flex items-center justify-center relative group overflow-hidden">
+                                        <span
+                                            class="material-symbols-outlined text-teal-500 text-4xl">photo_camera</span>
+                                        <div
+                                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <button
+                                                class="p-1.5 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition"
+                                                onclick="showToast('Photo removed')"><span
+                                                    class="material-symbols-outlined text-white text-sm">delete</span></button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="aspect-square rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 flex items-center justify-center relative group overflow-hidden">
+                                        <span class="material-symbols-outlined text-purple-500 text-4xl">videocam</span>
+                                        <div
+                                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <button
+                                                class="p-1.5 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition"
+                                                onclick="showToast('Photo removed')"><span
+                                                    class="material-symbols-outlined text-white text-sm">delete</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="aspect-square rounded-xl border-2 border-dashed border-[#e0e8e8] dark:border-[#2a4a4a] flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary dark:hover:border-accent-gold transition-colors group"
+                                        onclick="document.getElementById('mediaUploadInput').click()">
+                                        <input type="file" id="mediaUploadInput" class="hidden" accept="image/*" onchange="uploadPortfolioMedia(this)" />
+                                        <span
+                                            class="material-symbols-outlined text-[#5e8d8d] group-hover:text-primary dark:group-hover:text-accent-gold text-3xl transition-colors">add_photo_alternate</span>
+                                        <p
+                                            class="text-xs font-bold text-[#5e8d8d] group-hover:text-primary dark:group-hover:text-accent-gold transition-colors">
+                                            Add Media</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6">
+                                <div
+                                    class="flex items-center justify-between mb-4 border-b border-[#e0e8e8] dark:border-[#2a4a4a] pb-4">
+                                    <h3 class="font-bold text-lg">Client Reviews</h3>
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-accent-gold text-[18px]"
+                                            style="font-variation-settings:'FILL' 1">star</span>
+                                        <span class="font-black text-sm">4.9</span>
+                                        <span class="text-xs text-[#5e8d8d] font-semibold">(48 reviews)</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4" id="reviewsList"></div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div
+                                class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6 text-center">
+                                <div id="summaryAvatar"
+                                    class="size-24 rounded-full avatar-placeholder mx-auto mb-4 text-2xl shadow-lg border-4 border-primary/20">
+                                    LF</div>
+                                <h3 id="summaryProfileName" class="font-bold text-lg">Lumiere Films</h3>
+                                <p id="summaryProfileDetails" class="text-sm text-[#5e8d8d] font-semibold">Photographer
+                                    · Mumbai</p>
+                                <div class="flex justify-center gap-1 mt-2 mb-4">
+                                    <span class="material-symbols-outlined text-accent-gold text-[16px]"
+                                        style="font-variation-settings:'FILL' 1">star</span>
+                                    <span class="material-symbols-outlined text-accent-gold text-[16px]"
+                                        style="font-variation-settings:'FILL' 1">star</span>
+                                    <span class="material-symbols-outlined text-accent-gold text-[16px]"
+                                        style="font-variation-settings:'FILL' 1">star</span>
+                                    <span class="material-symbols-outlined text-accent-gold text-[16px]"
+                                        style="font-variation-settings:'FILL' 1">star</span>
+                                    <span class="material-symbols-outlined text-accent-gold text-[16px]"
+                                        style="font-variation-settings:'FILL' 1">star</span>
+                                </div>
+                                <button
+                                    class="w-full text-sm bg-primary/10 dark:bg-accent-gold/10 text-primary dark:text-accent-gold font-bold py-2 rounded-lg hover:bg-primary/20 transition ripple"
+                                    onclick="showToast('Opening public profile preview...')">Preview Public
+                                    Profile</button>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6">
+                                <h3 class="font-bold mb-4 text-sm uppercase tracking-wider text-[#5e8d8d]">Social Links
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="size-9 rounded-lg bg-pink-50 dark:bg-pink-900/20 flex items-center justify-center shrink-0">
+                                            <span
+                                                class="material-symbols-outlined text-pink-500 text-[18px]">photo_camera</span>
+                                        </div>
+                                        <input type="text" placeholder="Instagram URL"
+                                            class="flex-1 text-sm border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition" />
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="size-9 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center shrink-0">
+                                            <span
+                                                class="material-symbols-outlined text-red-500 text-[18px]">play_circle</span>
+                                        </div>
+                                        <input type="text" placeholder="YouTube Channel URL"
+                                            class="flex-1 text-sm border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition" />
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="size-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+                                            <span
+                                                class="material-symbols-outlined text-blue-500 text-[18px]">language</span>
+                                        </div>
+                                        <input type="text" placeholder="Website URL" value="www.lumierefilms.in"
+                                            class="flex-1 text-sm border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6">
+                                <h3 class="font-bold mb-3 text-sm">Share Client Feedback Link</h3>
+                                <p class="text-xs text-[#5e8d8d] mb-3">Send this link to clients so they can leave a
+                                    review.</p>
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="flex-1 text-xs bg-gray-50 dark:bg-[#102a2a] border border-[#e0e8e8] dark:border-[#2a4a4a] rounded-lg px-3 py-2 font-mono text-[#5e8d8d] truncate">
+                                        eazeevent.in/r/lumiere</div>
+                                    <button
+                                        class="px-3 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition ripple"
+                                        onclick="showToast('Link copied to clipboard!')">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-earnings" class="page space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-black tracking-tight">Earnings</h2>
+                        <p class="text-[#5e8d8d] mt-1">Track your revenue, payouts, and financial performance.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div
+                            class="bg-white dark:bg-[#1d3a3a] p-6 rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm">
+                            <p class="text-sm font-semibold text-[#5e8d8d] mb-1">Total Payouts Released</p>
+                            <h3 class="text-2xl font-black text-green-500" id="earnMonthText">₹0</h3>
+                            <p class="text-xs font-bold text-green-500 mt-1 flex items-center gap-1"><span
+                                    class="material-symbols-outlined text-[14px]">trending_up</span> Active
+                            </p>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-[#1d3a3a] p-6 rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm">
+                            <p class="text-sm font-semibold text-[#5e8d8d] mb-1">Total This Year</p>
+                            <h3 class="text-2xl font-black">₹48,20,000</h3>
+                            <p class="text-xs text-[#5e8d8d] mt-1">FY 2025–26</p>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-[#1d3a3a] p-6 rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm">
+                            <p class="text-sm font-semibold text-[#5e8d8d] mb-1">Pending Payout (Escrow)</p>
+                            <h3 class="text-2xl font-black text-accent-gold" id="earnPendingText">₹0</h3>
+                            <button
+                                class="mt-2 text-xs font-bold text-primary dark:text-accent-gold border border-primary/30 dark:border-accent-gold/30 px-3 py-1 rounded-lg hover:bg-primary/5 transition ripple"
+                                onclick="showToast('Payout request submitted!')">Request Payout</button>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-[#1d3a3a] p-6 rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm">
+                        <h3 class="font-bold mb-6">Monthly Revenue (2026)</h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="earningsChartCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm overflow-hidden">
+                        <div
+                            class="p-6 border-b border-[#e0e8e8] dark:border-[#2a4a4a] flex items-center justify-between">
+                            <h3 class="font-bold">Recent Transactions</h3>
+                            <button class="text-sm font-bold text-primary dark:text-accent-gold hover:underline"
+                                onclick="showToast('Exporting CSV...')">Export CSV</button>
+                        </div>
+                        <div id="transactionsList"></div>
+                    </div>
+                </div>
+
+                <div id="page-ai-marketing" class="page space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-black tracking-tight">AI Marketing</h2>
+                        <p class="text-[#5e8d8d] mt-1">Let AI create powerful marketing content for your business.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div
+                            class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-xl ai-gradient flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white text-[18px]">edit_note</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold">Generate Caption</h3>
+                                    <p class="text-xs text-[#5e8d8d]">AI-powered social media captions</p>
+                                </div>
+                            </div>
+                            <select id="captionTone"
+                                class="w-full text-sm border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30">
+                                <option>Romantic & Elegant</option>
+                                <option>Fun & Playful</option>
+                                <option>Professional & Formal</option>
+                                <option>Emotional & Heartfelt</option>
+                            </select>
+                            <textarea id="captionInput" rows="3"
+                                placeholder="Describe the photo/video (e.g. Sunset wedding at Udaipur palace, bride and groom's first dance...)"
+                                class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition resize-none"></textarea>
+                            <button id="genCaptionBtn"
+                                class="w-full bg-primary text-white font-bold py-2.5 rounded-xl hover:bg-primary/90 transition flex items-center justify-center gap-2 ripple">
+                                <span class="material-symbols-outlined text-[18px]">auto_awesome</span>Generate Caption
+                            </button>
+                            <div id="captionResult"
+                                class="hidden bg-primary/5 dark:bg-accent-gold/5 border border-primary/20 dark:border-accent-gold/20 rounded-xl p-4">
+                                <p id="captionText" class="text-sm font-semibold leading-relaxed"></p>
+                                <button
+                                    class="mt-3 text-xs font-bold text-primary dark:text-accent-gold flex items-center gap-1 hover:underline"
+                                    onclick="copyCaptionText()"><span
+                                        class="material-symbols-outlined text-[14px]">content_copy</span>Copy</button>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-6 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-xl bg-accent-gold/20 flex items-center justify-center">
+                                    <span
+                                        class="material-symbols-outlined text-accent-gold text-[18px]">tips_and_updates</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold">AI Business Tips</h3>
+                                    <p class="text-xs text-[#5e8d8d]">Personalized insights for your growth</p>
+                                </div>
+                            </div>
+                            <div id="aiTipsList" class="space-y-3"></div>
+                            <button id="refreshTipsBtn"
+                                class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] text-sm font-bold py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-[#102a2a] transition flex items-center justify-center gap-2 ripple">
+                                <span class="material-symbols-outlined text-[18px]">refresh</span>Refresh Tips
+                            </button>
+                        </div>
+                        <div
+                            class="ai-gradient rounded-2xl p-6 text-white shadow-xl col-span-1 lg:col-span-2 relative overflow-hidden">
+                            <span
+                                class="material-symbols-outlined absolute -right-6 -bottom-6 text-9xl text-white/5 pointer-events-none">rocket_launch</span>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <p class="text-accent-gold font-bold text-sm uppercase tracking-widest mb-2">Boost
+                                        Your Listing</p>
+                                    <h3 class="text-2xl font-black mb-2">Reach 10x More Couples</h3>
+                                    <p class="text-white/80 text-sm max-w-lg">Get featured at the top of search results
+                                        in your city. Lumiere Films currently ranks <strong
+                                            class="text-white">#7</strong> in Mumbai — boost to reach the top 3.</p>
+                                </div>
+                                <div class="shrink-0 text-center">
+                                    <div class="text-3xl font-black mb-1">₹999<span
+                                            class="text-lg font-semibold text-white/70">/wk</span></div>
+                                    <button
+                                        class="bg-accent-gold text-primary font-black px-6 py-2.5 rounded-xl hover:bg-accent-gold/90 transition shadow-lg active:scale-95 ripple"
+                                        onclick="openBoostModal()">Boost Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="chatModal" class="modal-overlay">
+        <div class="modal-box bg-white dark:bg-[#1d3a3a] rounded-2xl shadow-2xl w-full max-w-lg border border-[#e0e8e8] dark:border-[#2a4a4a] overflow-hidden mx-4 flex flex-col"
+            style="height:520px">
+            <div
+                class="p-4 border-b border-[#e0e8e8] dark:border-[#2a4a4a] flex items-center justify-between bg-gray-50 dark:bg-[#102a2a]">
+                <div class="flex items-center gap-3">
+                    <div id="chatAvatar" class="size-10 rounded-full avatar-placeholder text-sm">AK</div>
+                    <div>
+                        <p id="chatName" class="font-bold text-sm">Aditi & Karan</p>
+                        <p id="chatPkg" class="text-xs text-[#5e8d8d]">2 Days Wedding Package</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('chatModal')" class="text-[#5e8d8d] hover:text-red-500 transition"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+            <div class="p-4 border-t border-[#e0e8e8] dark:border-[#2a4a4a] flex gap-2">
+                <input id="chatInput" type="text" placeholder="Type a message..."
+                    class="flex-1 border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                    onkeydown="if(event.key==='Enter') sendChatMessage()" />
+                <button onclick="sendChatMessage()"
+                    class="px-4 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition ripple"><span
+                        class="material-symbols-outlined text-[18px]">send</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="removeModal" class="modal-overlay">
+        <div
+            class="modal-box bg-white dark:bg-[#1d3a3a] rounded-2xl shadow-2xl w-full max-w-md border border-[#e0e8e8] dark:border-[#2a4a4a] overflow-hidden mx-4">
+            <div class="p-5 border-b border-[#e0e8e8] dark:border-[#2a4a4a] flex items-center justify-between">
+                <h3 class="font-bold text-lg text-red-500">Decline & Remove Inquiry</h3>
+                <button onclick="closeModal('removeModal')" class="text-[#5e8d8d] hover:text-red-500 transition"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold mb-2 text-[#5e8d8d]">Apology Note</label>
+                    <textarea rows="4" id="removeApologyMsg"
+                        class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-red-500/30 transition resize-none"
+                        placeholder="e.g. I apologize, but we are not available on your requested date..."></textarea>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button
+                        class="flex-1 border border-[#e0e8e8] dark:border-[#2a4a4a] font-bold py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-[#102a2a] transition"
+                        onclick="closeModal('removeModal')">Cancel</button>
+                    <button
+                        class="flex-1 bg-red-500 text-white font-bold py-2.5 rounded-xl hover:bg-red-600 transition ripple"
+                        onclick="confirmRemoveInquiry()">OK, Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bookingModal" class="modal-overlay">
+        <div
+            class="modal-box bg-white dark:bg-[#1d3a3a] rounded-2xl shadow-2xl w-full max-w-md border border-[#e0e8e8] dark:border-[#2a4a4a] mx-4">
+            <div class="p-5 border-b border-[#e0e8e8] dark:border-[#2a4a4a] flex items-center justify-between">
+                <h3 class="font-bold text-lg">Booking Details</h3>
+                <button onclick="closeModal('bookingModal')" class="text-[#5e8d8d] hover:text-red-500 transition"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div id="bookingModalContent" class="p-5 space-y-3"></div>
+            <div class="p-5 pt-0 flex gap-2">
+                <button
+                    class="flex-1 border border-[#e0e8e8] dark:border-[#2a4a4a] text-sm font-bold py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-[#102a2a] transition ripple"
+                    onclick="closeModal('bookingModal')">Close</button>
+                <button
+                    class="flex-1 bg-primary text-white text-sm font-bold py-2.5 rounded-xl hover:bg-primary/90 transition ripple"
+                    onclick="openChatFromBooking()">Message Client</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal-overlay">
+        <div
+            class="modal-box bg-white dark:bg-[#1d3a3a] rounded-2xl shadow-2xl w-full max-w-md border border-[#e0e8e8] dark:border-[#2a4a4a] mx-4">
+            <div class="p-5 border-b border-[#e0e8e8] dark:border-[#2a4a4a] flex items-center justify-between">
+                <h3 class="font-bold text-lg">Settings</h3>
+                <button onclick="closeModal('settingsModal')" class="text-[#5e8d8d] hover:text-red-500 transition"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-sm">Email Notifications</p>
+                        <p class="text-xs text-[#5e8d8d]">Receive alerts for new inquiries</p>
+                    </div>
+                    <label class="toggle-switch"><input type="checkbox" checked /><span
+                            class="toggle-slider"></span></label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-sm">WhatsApp Alerts</p>
+                        <p class="text-xs text-[#5e8d8d]">Instant WhatsApp for new leads</p>
+                    </div>
+                    <label class="toggle-switch"><input type="checkbox" /><span class="toggle-slider"></span></label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-sm">Auto-reply to Inquiries</p>
+                        <p class="text-xs text-[#5e8d8d]">Send automated first response</p>
+                    </div>
+                    <label class="toggle-switch"><input type="checkbox" checked /><span
+                            class="toggle-slider"></span></label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-sm">Show Pricing Publicly</p>
+                        <p class="text-xs text-[#5e8d8d]">Display starting price on your profile</p>
+                    </div>
+                    <label class="toggle-switch"><input type="checkbox" checked /><span
+                            class="toggle-slider"></span></label>
+                </div>
+                <div class="border-t border-[#e0e8e8] dark:border-[#2a4a4a] pt-4">
+                    <button
+                        class="w-full text-sm text-red-500 font-bold py-2.5 rounded-xl border border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-900/10 transition"
+                        onclick="closeModal('settingsModal'); showToast('Password reset email sent!')">Change
+                        Password</button>
+                </div>
+            </div>
+            <div class="p-5 pt-0">
+                <button
+                    class="w-full bg-primary text-white font-bold py-2.5 rounded-xl hover:bg-primary/90 transition ripple"
+                    onclick="closeModal('settingsModal'); showToast('Settings saved!')">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="boostModal" class="modal-overlay">
+        <div
+            class="modal-box bg-white dark:bg-[#1d3a3a] rounded-2xl shadow-2xl w-full max-w-md border border-[#e0e8e8] dark:border-[#2a4a4a] mx-4">
+            <div class="p-5 border-b border-[#e0e8e8] dark:border-[#2a4a4a] flex items-center justify-between">
+                <h3 class="font-bold text-lg">Boost Listing</h3>
+                <button onclick="closeModal('boostModal')" class="text-[#5e8d8d] hover:text-red-500 transition"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-3 gap-3" id="boostPlans"></div>
+                <div class="bg-gray-50 dark:bg-[#102a2a] rounded-xl p-4 space-y-2">
+                    <p class="text-xs font-bold text-[#5e8d8d] uppercase">What you get</p>
+                    <div class="flex items-center gap-2 text-sm"><span
+                            class="material-symbols-outlined text-green-500 text-[16px]">check</span>Featured placement
+                        in Mumbai</div>
+                    <div class="flex items-center gap-2 text-sm"><span
+                            class="material-symbols-outlined text-green-500 text-[16px]">check</span>"Top Vendor" badge
+                    </div>
+                    <div class="flex items-center gap-2 text-sm"><span
+                            class="material-symbols-outlined text-green-500 text-[16px]">check</span>Priority lead
+                        delivery</div>
+                </div>
+                <button
+                    class="w-full bg-accent-gold text-primary font-black py-2.5 rounded-xl hover:bg-accent-gold/90 transition ripple"
+                    onclick="activateBoost()">Activate
+                    Boost</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal-overlay">
+        <div
+            class="modal-box bg-white dark:bg-[#1d3a3a] rounded-2xl shadow-2xl w-full max-w-sm border border-[#e0e8e8] dark:border-[#2a4a4a] mx-4 p-6 text-center">
+            <div
+                class="size-14 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-red-500 text-3xl">logout</span>
+            </div>
+            <h3 class="font-bold text-xl mb-2">Log Out?</h3>
+            <p class="text-sm text-[#5e8d8d] mb-6">You'll need to sign in again to access your dashboard.</p>
+            <div class="flex gap-3">
+                <button
+                    class="flex-1 border border-[#e0e8e8] dark:border-[#2a4a4a] font-bold py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-[#102a2a] transition"
+                    onclick="closeModal('logoutModal')">Cancel</button>
+                <button
+                    class="flex-1 bg-red-500 text-white font-bold py-2.5 rounded-xl hover:bg-red-600 transition ripple"
+                    onclick="closeModal('logoutModal'); showToast('Logged out successfully. Goodbye! 👋')">Log
+                    Out</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reviewModal" class="modal-overlay">
+        <div
+            class="modal-box bg-white dark:bg-[#1d3a3a] rounded-2xl shadow-2xl w-full max-w-md border border-[#e0e8e8] dark:border-[#2a4a4a] mx-4">
+            <div class="p-5 border-b border-[#e0e8e8] dark:border-[#2a4a4a] flex items-center justify-between">
+                <h3 class="font-bold text-lg">Reply to Review</h3>
+                <button onclick="closeModal('reviewModal')" class="text-[#5e8d8d] hover:text-red-500 transition"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <textarea id="reviewReply" rows="4" placeholder="Write your reply..."
+                    class="w-full border border-[#e0e8e8] dark:border-[#2a4a4a] bg-gray-50 dark:bg-[#102a2a] rounded-lg px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 transition resize-none"></textarea>
+                <button
+                    class="w-full bg-primary text-white font-bold py-2.5 rounded-xl hover:bg-primary/90 transition ripple"
+                    onclick="closeModal('reviewModal'); showToast('Reply posted!')">Post Reply</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] bg-[#101818] dark:bg-white text-white dark:text-[#101818] px-5 py-3 rounded-full text-sm font-bold shadow-2xl flex items-center gap-2 pointer-events-none whitespace-nowrap">
+        <span class="material-symbols-outlined text-[16px] text-green-400 dark:text-green-600">check_circle</span>
+        <span id="toastMsg">Done!</span>
+    </div>
+
+</body>
+</html>

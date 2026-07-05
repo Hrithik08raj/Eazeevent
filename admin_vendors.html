@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vendor Management | Eazeevent</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="js/admin.js" defer></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#65381d",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "accent-gold": "#D4AF37",
+                        "primary-fixed-dim": "#95d1d0",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f2f4f3",
+                        "warning-orange": "#c2410c",
+                        "surface-container": "#eceeed",
+                        "surface-bright": "#f8faf9",
+                        "on-secondary-container": "#3d6c6c",
+                        "surface-container-high": "#e7e8e8",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffdbca",
+                        "inverse-surface": "#2e3131",
+                        "surface-dim": "#d8dada",
+                        "surface-border": "#dae7e7",
+                        "on-tertiary-fixed": "#331200",
+                        "background-dark": "#0f2323",
+                        "secondary": "#376666",
+                        "on-surface-variant": "#3f4848",
+                        "tertiary": "#4a2309",
+                        "error": "#ba1a1a",
+                        "background-light": "#f5f8f8",
+                        "outline": "#707978",
+                        "error-container": "#ffdad6",
+                        "success-green": "#15803d",
+                        "on-tertiary-fixed-variant": "#693b20",
+                        "surface-container-highest": "#e1e3e2",
+                        "error-red": "#ef4444",
+                        "on-primary": "#ffffff",
+                        "surface": "#f8faf9",
+                        "on-surface": "#191c1c",
+                        "secondary-fixed": "#baeceb",
+                        "primary-fixed": "#b1eeed",
+                        "inverse-on-surface": "#eff1f0",
+                        "background": "#f8faf9",
+                        "secondary-container": "#baeceb",
+                        "surface-variant": "#e1e3e2",
+                        "on-secondary-fixed": "#002020",
+                        "surface-tint": "#2a6767",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#fab894",
+                        "on-primary-fixed": "#002020",
+                        "on-primary-container": "#ffffff",
+                        "on-secondary-fixed-variant": "#1d4e4e",
+                        "primary": "#003434",
+                        "inverse-primary": "#95d1d0",
+                        "secondary-fixed-dim": "#9fcfcf",
+                        "primary-container": "#004c4c",
+                        "on-background": "#191c1c",
+                        "outline-variant": "#bfc8c8",
+                        "on-tertiary-container": "#e2a280",
+                        "on-primary-fixed-variant": "#95d1d0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "1.5rem",
+                        "sidebar-width-right": "20rem",
+                        "card-padding": "1.5rem",
+                        "component-gap-sm": "0.5rem",
+                        "section-gap": "2rem",
+                        "sidebar-width-left": "16rem",
+                        "container-margin": "2rem"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-xs": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["30px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "headline-md": ["20px", { "lineHeight": "1.4", "fontWeight": "700" }],
+                        "label-bold": ["10px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "1.4", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "1.5", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-xs": ["9px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "body-sm": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light text-on-surface font-body-md text-body-md antialiased overflow-x-hidden flex h-screen">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full flex flex-col py-6 bg-primary dark:bg-background-dark docked-left w-sidebar-width-left shadow-md z-50 justify-between">
+<div class="flex flex-col px-4 gap-8">
+<div class="px-4">
+<h1 class="font-display-lg text-display-lg text-accent-gold tracking-tight">Eazeevent</h1>
+<p class="font-label-xs text-label-xs text-primary-fixed mt-1 uppercase tracking-wider">Admin Terminal</p>
+</div>
+<ul class="flex flex-col gap-1">
+<li>
+<a class="flex items-center gap-component-gap-sm px-4 py-3 text-on-primary-fixed-variant hover:bg-secondary-container/10 hover:bg-secondary-container/20 transition-colors rounded-lg" href="admin_overview.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Overview</span>
+</a>
+</li>
+<li>
+<!-- Active State for Vendors -->
+<a class="flex items-center gap-component-gap-sm px-4 py-3 bg-primary-container text-on-primary-container rounded-lg Active: scale-[0.98] transition-transform" href="admin_vendors.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">storefront</span>
+<span class="font-body-md text-body-md font-bold">Vendors</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-component-gap-sm px-4 py-3 text-on-primary-fixed-variant hover:bg-secondary-container/10 hover:bg-secondary-container/20 transition-colors rounded-lg" href="admin_customers.html">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Customers</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-component-gap-sm px-4 py-3 text-on-primary-fixed-variant hover:bg-secondary-container/10 hover:bg-secondary-container/20 transition-colors rounded-lg" href="admin_finance.html">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Finance</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-component-gap-sm px-4 py-3 text-on-primary-fixed-variant hover:bg-secondary-container/10 hover:bg-secondary-container/20 transition-colors rounded-lg" href="admin_settings.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="px-4 flex flex-col gap-4">
+<button class="w-full bg-accent-gold text-primary py-3 rounded-lg font-bold shadow-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-2" onclick="window.location.href='admin_customers.html#tickets'">
+<span class="material-symbols-outlined">support_agent</span>
+                Support Tickets
+            </button>
+<ul class="flex flex-col gap-1 border-t border-primary-container pt-4">
+<li>
+<a class="flex items-center gap-component-gap-sm px-4 py-3 text-on-primary-fixed-variant hover:bg-secondary-container/10 hover:bg-secondary-container/20 transition-colors rounded-lg" href="#" onclick="alert('Audit logs show verified vendors, resolved support inquiries, and customer risk reports.')">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-sm text-body-sm">Audit Log</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-component-gap-sm px-4 py-3 text-on-primary-fixed-variant hover:bg-secondary-container/10 hover:bg-secondary-container/20 transition-colors rounded-lg" href="index.html">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-sm text-body-sm">Logout</span>
+</a>
+</li>
+</ul>
+<div class="flex items-center gap-3 px-4 pt-2">
+<img alt="Admin User Profile" class="w-8 h-8 rounded-full border border-secondary-container/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0rG9jLtmIZ2nikqreOXu5_8TJoVc8UjYbB-Ngt1m06xRzYQePFxOcZTILp1xEP755UE9oNh9--TQ96BzqAjdPgJNy2PaN7hn6VhRlX9DkAUPtH1Bo6jwwyKu0kAlOvC8ik_bHBoqJY1sxUkKbyZyAi7bcN0blVzzatQ-HTILYUbDCoiIRoxryUHC13wCHnrJwYagxE7HxPeePUTpfUv7zr9eSCNwdu5PfkSDMBTL8EN14qaRS5htWtVWKI8_7mPdZ5uT_YpcTog"/>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-white">A. Sharma</span>
+<span class="text-xs text-on-primary-fixed-variant">System Admin</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-sidebar-width-left flex flex-col h-full overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter w-full h-16 bg-surface dark:bg-surface-dim border-b border-surface-border dark:border-outline-variant shrink-0">
+<div class="flex items-center gap-6">
+<span class="font-headline-sm text-headline-sm text-primary dark:text-inverse-primary font-bold">Admin Central</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim cursor-pointer transition-all duration-200 font-body-md text-body-md" href="admin_overview.html">Global Feed</a>
+<!-- Active State for Verification Queue context in TopNav (optional but logical if it's the primary view focus) -->
+<a class="text-primary font-bold border-b-2 border-accent-gold pb-1 cursor-pointer transition-all duration-200 font-body-md text-body-md" href="admin_vendors.html">Verification Queue</a>
+<a class="text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim cursor-pointer transition-all duration-200 font-body-md text-body-md" href="admin_customers.html">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-container-low border-0 rounded-full pl-10 pr-4 py-2 font-body-sm text-body-sm text-on-surface focus:ring-1 focus:ring-primary outline-none w-64" id="vendorSearchInput" placeholder="Search vendors..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm text-body-sm hover:opacity-90 transition-opacity" onclick="alert('Notice broadcast system is simulated.')">Create Notice</button>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors" onclick="alert('No new notifications!')"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors" onclick="alert('Help documentation is under development!')"><span class="material-symbols-outlined">help_outline</span></button>
+</div>
+<img alt="Admin Profile Avatar" class="w-8 h-8 rounded-full border border-surface-border object-cover ml-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDz7FV5O2b7WQdfNZlOvN8yVOlCmux76UPSPFBxhsSjBKvJIPHu0IDbuQLbvKaNDjZxXG4MdQDD7w7prs50on5rrHj1qXJC44WK2N-juKua6niRfkKgy3jhYrrITl43ok7gpJU6KbvipxzYPVjUdp-jbMGSQ466uwJeMI4cJI86ySxkDSD8bO4T_Ekxe4uaNTpjT8BCgagHBLN_MLRN9J9_11dEddEXHg2e-erqGdI4btgW_PfoEcItmnywW4cMVYl7onGxo6ueAQ"/>
+</div>
+</header>
+<!-- Scrollable Canvas -->
+<main class="flex-1 overflow-y-auto p-container-margin flex flex-col gap-section-gap">
+<!-- Verification Queue Highlight -->
+<section class="flex flex-col gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-warning-orange" style="font-variation-settings: 'FILL' 1;">pending_actions</span>
+<h2 class="font-headline-md text-headline-md text-primary">Priority Verification Queue</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="verificationQueueContainer">
+<!-- Dynamic queue cards -->
+</div>
+</section>
+<!-- Main Vendor Table Section -->
+<section class="flex flex-col gap-4">
+<!-- Advanced Filter Bar -->
+<div class="flex flex-wrap items-center gap-4 bg-surface-container-lowest border border-surface-border rounded-xl p-4 shadow-sm">
+<div class="flex items-center gap-2 border-r border-surface-border pr-4">
+<span class="material-symbols-outlined text-on-surface-variant">filter_list</span>
+<span class="font-body-md text-body-md font-bold text-on-surface">Filters</span>
+</div>
+<div class="flex-1 flex flex-wrap gap-4">
+<select class="bg-surface-container-low border-0 text-on-surface font-body-sm text-body-sm rounded-lg py-2 pl-3 pr-8 focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-black" id="specialtyFilter">
+<option value="All">All Specialties</option>
+<option value="Catering">Catering</option>
+<option value="Decoration">Decoration & Flowers</option>
+<option value="Photography">Photography</option>
+<option value="Videography">Videography</option>
+<option value="Venues">Venues</option>
+<option value="Makeup">Makeup & Hair</option>
+<option value="Wedding Planner">Event & Wedding Planner</option>
+</select>
+<select class="bg-surface-container-low border-0 text-on-surface font-body-sm text-body-sm rounded-lg py-2 pl-3 pr-8 focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-black" id="cityFilter">
+<option value="All">All Cities</option>
+<option value="Mumbai">Mumbai</option>
+<option value="Delhi">Delhi</option>
+<option value="Jaipur">Jaipur</option>
+<option value="Udaipur">Udaipur</option>
+<option value="Goa">Goa</option>
+<option value="Bangalore">Bangalore</option>
+</select>
+<select class="bg-surface-container-low border-0 text-on-surface font-body-sm text-body-sm rounded-lg py-2 pl-3 pr-8 focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-black" id="statusFilter">
+<option value="All">All Statuses</option>
+<option value="Verified">Verified</option>
+<option value="In-Review">In-Review</option>
+<option value="Pending">Pending</option>
+<option value="Suspended">Suspended</option>
+</select>
+<select class="bg-surface-container-low border-0 text-on-surface font-body-sm text-body-sm rounded-lg py-2 pl-3 pr-8 focus:ring-1 focus:ring-primary appearance-none cursor-pointer text-black" id="ratingFilter">
+<option value="All">Any Rating</option>
+<option value="4.5">4.5 &amp; Above</option>
+<option value="4.0">4.0 &amp; Above</option>
+</select>
+</div>
+<button class="text-primary font-body-sm text-body-sm hover:underline ml-auto" id="clearFiltersBtn">Clear All</button>
+</div>
+<!-- Data Table Container -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-xl shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-bright">
+<th class="font-label-bold text-label-bold text-on-surface-variant uppercase py-4 px-6 border-b border-surface-border whitespace-nowrap">Vendor Details</th>
+<th class="font-label-bold text-label-bold text-on-surface-variant uppercase py-4 px-6 border-b border-surface-border whitespace-nowrap">Category</th>
+<th class="font-label-bold text-label-bold text-on-surface-variant uppercase py-4 px-6 border-b border-surface-border whitespace-nowrap">Location</th>
+<th class="font-label-bold text-label-bold text-on-surface-variant uppercase py-4 px-6 border-b border-surface-border whitespace-nowrap">Bookings</th>
+<th class="font-label-bold text-label-bold text-on-surface-variant uppercase py-4 px-6 border-b border-surface-border whitespace-nowrap">Rating</th>
+<th class="font-label-bold text-label-bold text-on-surface-variant uppercase py-4 px-6 border-b border-surface-border whitespace-nowrap">Status</th>
+<th class="font-label-bold text-label-bold text-on-surface-variant uppercase py-4 px-6 border-b border-surface-border whitespace-nowrap text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-border" id="vendorTableBody">
+<!-- Dynamic table body -->
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="bg-surface-bright border-t border-surface-border p-4 flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant" id="vendorPaginationText">Showing 1-4 of 1,248 vendors</span>
+<div class="flex items-center gap-2" id="vendorPaginationContainer">
+<!-- Dynamic pagination -->
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom spacing -->
+<div class="h-8"></div>
+</main>
+</div>
+
+<!-- Admin Modal (Portfolio Review) -->
+<div id="adminModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center hidden overflow-y-auto">
+    <div class="bg-white dark:bg-background-dark rounded-2xl max-w-lg w-full mx-4 p-6 shadow-2xl relative my-8" id="adminModalContent">
+        <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <div id="adminModalBody">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+</div>
+
+</body></html>

@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.toast
+.untracked
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# IDE & Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.agents/
+.gemini/
+
+# Static Uploads & Media
+backend/static/uploads/*
+!backend/static/uploads/.gitkeep
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

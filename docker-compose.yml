@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: eazeevent-postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: eazeevent_user
+      POSTGRES_PASSWORD: secure_postgres_password
+      POSTGRES_DB: eazeevent
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: eazeevent-fastapi-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://eazeevent_user:secure_postgres_password@db:5432/eazeevent
+      - SECRET_KEY=generate_a_long_random_key_here_for_production
+      - API_BASE_URL=http://127.0.0.1:8000
+    depends_on:
+      - db
+    volumes:
+      - ./backend/static/uploads:/code/static/uploads
+
+volumes:
+  postgres_data:

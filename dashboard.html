@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Customer's Planning Dashboard | Eazeevent</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <link rel="stylesheet" href="css/global.css" />
+    <script src="js/dashboard.js" defer></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#004c4c", "accent-gold": "#D4AF37", "background-light": "#f5f8f8", "background-dark": "#0f2323" },
+                    fontFamily: { "display": ["Inter", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#101818] dark:text-white font-display overflow-x-hidden transition-colors duration-200">
+<div class="toast" id="toast"></div>
+
+<div class="flex min-h-screen">
+    <aside class="w-64 bg-primary text-white flex flex-col fixed h-full z-20 shadow-2xl">
+        <div class="p-6 flex items-center gap-3 border-b border-white/10">
+            <a href="index.html" class="block flex-shrink-0 hover:opacity-80 transition-opacity">
+                <img src="Eazeevent_img.jpeg" alt="Eazeevent Logo" class="h-10 w-10 rounded-full object-cover bg-white">
+            </a>
+            <div>
+                <h1 class="text-xl font-bold leading-none">Eazeevent</h1>
+                <p class="text-xs text-white/60">Customer Dashboard</p>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-1" id="sidebar-nav">
+            <a class="nav-link flex items-center gap-3 px-4 py-3 bg-white/10 rounded-lg text-white transition-colors" href="#" data-page="dashboard">
+                <span class="material-symbols-outlined">dashboard</span><span class="font-medium">Dashboard</span>
+            </a>
+            <a class="nav-link flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-lg text-white/80 transition-colors" href="#" data-page="marketplace">
+                <span class="material-symbols-outlined">storefront</span><span class="font-medium">Marketplace</span>
+            </a>
+            <a class="nav-link flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-lg text-white/80 transition-colors" href="#" data-page="guests">
+                <span class="material-symbols-outlined">group</span><span class="font-medium">Guest Manager</span>
+            </a>
+            <a class="nav-link flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-lg text-white/80 transition-colors" href="#" data-page="budget">
+                <span class="material-symbols-outlined">account_balance_wallet</span><span class="font-medium">Budget Tracker</span>
+            </a>
+            <a class="nav-link flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-lg text-white/80 transition-colors" href="#" data-page="timeline">
+                <span class="material-symbols-outlined">calendar_month</span><span class="font-medium">Event Timeline</span>
+            </a>
+            <a class="nav-link flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-lg text-white/80 transition-colors" href="#" data-page="checklist">
+                <span class="material-symbols-outlined">playlist_add_check</span><span class="font-medium">Checklist</span>
+            </a>
+        </nav>
+        
+        <div class="p-4 mt-auto border-t border-white/10 relative">
+            
+            <div id="profileMenu" class="absolute bottom-[80px] left-4 right-4 mb-2 bg-white dark:bg-[#1d3a3a] text-[#101818] dark:text-white rounded-xl shadow-2xl border border-[#dae7e7] dark:border-white/10 overflow-hidden transform scale-95 opacity-0 pointer-events-none transition-all duration-200 origin-bottom z-50">
+                <div class="p-4 border-b border-[#dae7e7] dark:border-white/10">
+                    <p class="font-bold text-sm" id="menuProfileName">Ananya Sharma</p>
+                    <p class="text-xs text-[#5e8d8d] dark:text-gray-400 mt-0.5" id="menuProfileEmail">ananya.sharma@example.com</p>
+                </div>
+                <div class="p-2 space-y-1">
+                    <button onclick="openEditProfileModal(); closeProfileMenu();" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-left">
+                        <span class="material-symbols-outlined text-[18px]">person</span> Edit Profile
+                    </button>
+                    <button onclick="showPage('bookings'); closeProfileMenu();" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-left">
+                        <span class="material-symbols-outlined text-[18px]">receipt_long</span> My Bookings
+                    </button>
+                    <button onclick="showPage('settings'); closeProfileMenu();" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-left">
+                        <span class="material-symbols-outlined text-[18px]">settings</span> Settings
+                    </button>
+                    <button onclick="showPage('about'); closeProfileMenu();" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-left">
+                        <span class="material-symbols-outlined text-[18px]">info</span> About
+                    </button>
+                    <button onclick="showPage('support'); closeProfileMenu();" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-left">
+                        <span class="material-symbols-outlined text-[18px]">help</span> Help & Support
+                    </button>
+                </div>
+                <div class="p-2 border-t border-[#dae7e7] dark:border-white/10">
+                    <a href="index.html" onclick="sessionStorage.clear()" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-bold text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left">
+                        <span class="material-symbols-outlined text-[18px]">logout</span> Log Out
+                    </a>
+                </div>
+            </div>
+
+            <button onclick="toggleProfileMenu()" id="profileBtn" class="w-full bg-white/5 hover:bg-white/10 transition-colors rounded-xl p-3 flex items-center justify-between group outline-none focus:ring-2 focus:ring-accent-gold">
+                <div class="flex items-center gap-3 text-left">
+                    <img src="https://i.pravatar.cc/100?u=ananya" alt="Avatar" id="sidebarAvatar" class="h-10 w-10 rounded-full border border-white/20 object-cover">
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-semibold truncate text-white" id="btnProfileName">Ananya Sharma</p>
+                        <p class="text-[11px] text-white/60 truncate" id="btnProfileRole">Bride-to-be 💍</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined text-white/40 group-hover:text-white transition-colors">unfold_more</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="ml-64 flex-1 flex">
+        <div class="flex-1 p-8 overflow-y-auto min-h-screen">
+            
+            <div id="page-dashboard" class="page-section active">
+                <header class="flex justify-between items-center mb-8 flex-wrap gap-4">
+                    <div>
+                        <h2 class="text-3xl font-black tracking-tight">Customer's Planning Dashboard</h2>
+                        <p class="text-[#5e8d8d] dark:text-[#a3c2c2]">Automated guest list, AI vendor matchmaking, and financial tracking.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="showPage('bookings')" class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 text-primary dark:text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-white/10 transition-all active:scale-95 shadow-sm">
+                            <span class="material-symbols-outlined text-[20px]">receipt_long</span> View Bookings
+                        </button>
+                        <button onclick="showToast('Generating PDF Report...')" class="bg-gradient-to-r from-primary to-[#006666] text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/30 hover:scale-105 transition-all active:scale-95 border border-white/10">
+                            <span class="material-symbols-outlined text-[20px]">download</span> Export Report
+                        </button>
+                    </div>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-6 rounded-xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-accent-gold/10 rounded-full transition-transform group-hover:scale-150"></div>
+                        <div class="flex items-center justify-between mb-4">
+                            <p class="text-sm font-medium text-[#5e8d8d]">Days to Go</p>
+                            <span class="material-symbols-outlined text-accent-gold">event</span>
+                        </div>
+                        <p class="text-3xl font-bold" id="daysToGo">-</p>
+                        <p class="text-xs text-primary dark:text-accent-gold font-medium mt-1 uppercase" id="weddingDateDisplay">Wedding: -</p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-6 rounded-xl">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-sm font-medium text-[#5e8d8d]">RSVP Conversion</p>
+                            <span class="material-symbols-outlined text-primary">contact_mail</span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <p class="text-3xl font-bold" id="rsvpCount">0 / 0</p>
+                            <p class="text-xs text-[#5e8d8d] mb-1 font-medium">Confirmed</p>
+                        </div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="flex-1 bg-[#f0f5f5] dark:bg-white/10 h-2 rounded-full overflow-hidden flex">
+                                <div class="bg-green-500 h-full transition-all duration-1000" id="rsvpBarConfirmed" style="width:0%"></div>
+                                <div class="bg-orange-400 h-full transition-all duration-1000" id="rsvpBarPending" style="width:0%"></div>
+                                <div class="bg-red-500 h-full transition-all duration-1000" id="rsvpBarDeclined" style="width:0%"></div>
+                            </div>
+                            <span class="text-[10px] font-bold text-green-600 uppercase" id="rsvpPct">0%</span>
+                        </div>
+                        <div class="flex gap-3 text-[9px] text-[#5e8d8d] font-bold uppercase tracking-wider">
+                            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Yes</span>
+                            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> Wait</span>
+                            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> No</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-6 rounded-xl flex items-center justify-between">
+                        <div class="flex flex-col h-full justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <p class="text-sm font-medium text-[#5e8d8d]">Budget Health</p>
+                                    <span class="material-symbols-outlined text-primary" id="topBudgetIcon">account_balance_wallet</span>
+                                </div>
+                                <p class="text-2xl font-bold mt-1" id="topBudgetSpent"><span class="currency-symbol">₹</span> 0</p>
+                                <p class="text-[11px] text-[#5e8d8d] font-medium" id="topBudgetTotal">of <span class="currency-symbol">₹</span> 0</p>
+                            </div>
+                            <p class="text-[10px] font-bold mt-2 flex items-center gap-1" id="topBudgetStatus">
+                                <span class="material-symbols-outlined text-[12px]">info</span> Setup needed
+                            </p>
+                        </div>
+                        <div class="relative w-20 h-20 flex-shrink-0">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                <path class="stroke-[#f0f5f5] dark:stroke-white/10" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="topBudgetRing" class="stroke-primary transition-all duration-1000" stroke-width="3.5" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                <span class="text-xs font-black" id="topBudgetPct">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <section class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold">Indian Budget Tracker</h3>
+                                <p class="text-xs text-[#5e8d8d]">Your real-time expense breakdown</p>
+                            </div>
+                            <button onclick="showPage('budget')" class="text-xs font-bold text-primary border border-primary/20 px-3 py-1 rounded-full flex items-center gap-1 hover:bg-primary/5 transition-colors">
+                                <span class="material-symbols-outlined text-[14px]">open_in_full</span> Manage
+                            </button>
+                        </div>
+                        
+                        <div id="dash-budget-preview" class="space-y-5">
+                            </div>
+                        
+                        <div class="mt-6 pt-6 border-t border-[#dae7e7] dark:border-white/10 flex justify-between items-center">
+                            <p class="text-xs font-bold text-[#5e8d8d] uppercase tracking-wider">Total Est. Tax (18%)</p>
+                            <p class="text-lg font-black text-primary dark:text-accent-gold" id="dash-budget-tax">₹ 0</p>
+                        </div>
+                    </section>
+
+                    <section class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">Guest & RSVP Manager</h3>
+                            <button onclick="showPage('guests')" class="text-xs font-bold text-primary border border-primary/20 px-3 py-1 rounded-full flex items-center gap-1 hover:bg-primary/5 transition-colors">
+                                <span class="material-symbols-outlined text-[14px]">open_in_full</span> Manage
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#f0f5f5] dark:bg-white/5 rounded-xl border border-primary/10 mb-4">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">notifications_active</span>
+                                <div><p class="text-xs font-bold">Auto-Follow-up Active</p><p class="text-[10px] text-[#5e8d8d]" id="dash-guest-pending-text">0 pending guests notified</p></div>
+                            </div>
+                            <button onclick="showPage('settings')" class="text-[10px] font-bold text-primary underline">Edit</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="text-[10px] uppercase text-[#5e8d8d] border-b border-[#dae7e7] dark:border-white/10">
+                                    <tr><th class="pb-2 font-bold">Name</th><th class="pb-2 font-bold text-center">RSVP</th><th class="pb-2 font-bold text-right">Side</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#dae7e7] dark:divide-white/10" id="dash-guest-preview">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <section class="mt-8 bg-gradient-to-br from-primary to-[#003333] rounded-2xl p-6 text-white overflow-hidden relative">
+                    <div class="absolute right-0 top-0 opacity-10 scale-150"><span class="material-symbols-outlined text-[200px]">psychology</span></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="material-symbols-outlined text-accent-gold">auto_awesome</span>
+                            <h3 class="text-lg font-bold">AI Vendor Matchmaker</h3>
+                        </div>
+                        <p class="text-sm text-white/70 mb-6 max-w-xl">Based on your remaining budget and wedding preferences, our AI found these matching verified vendors:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="ai-matchmaker-grid">
+                            <div class="col-span-1 md:col-span-3 text-center text-white/50 text-xs py-6">Finding your verified AI vendor matches...</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="page-marketplace" class="page-section">
+                <h2 class="text-3xl font-black mb-6">Marketplace</h2>
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-8 text-center">
+                    <span class="material-symbols-outlined text-6xl text-primary dark:text-accent-gold mb-4 block">storefront</span>
+                    <h3 class="text-xl font-bold mb-2">Browse All Vendors</h3>
+                    <p class="text-[#5e8d8d] mb-6">Find the perfect photographers, venues, caterers and more for your wedding day.</p>
+                    <a href="vendors.html" class="inline-block bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors">Open Marketplace →</a>
+                </div>
+            </div>
+
+            <div id="page-guests" class="page-section">
+                <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                    <h2 class="text-3xl font-black">Guest Manager</h2>
+                    <button onclick="openAddGuestModal()" class="bg-gradient-to-r from-primary to-[#006666] text-white font-bold px-6 py-2.5 rounded-full flex items-center gap-2 hover:shadow-lg hover:scale-105 transition-all active:scale-95 border border-white/10">
+                        <span class="material-symbols-outlined text-[18px]">person_add</span> Add New Guest
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-4 rounded-xl text-center"><p class="text-2xl font-black" id="guestTotal">0</p><p class="text-xs text-[#5e8d8d] mt-1">Total Invited</p></div>
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-4 rounded-xl text-center"><p class="text-2xl font-black text-green-600" id="guestConfirmed">0</p><p class="text-xs text-[#5e8d8d] mt-1">Confirmed</p></div>
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-4 rounded-xl text-center"><p class="text-2xl font-black text-orange-500" id="guestPending">0</p><p class="text-xs text-[#5e8d8d] mt-1">Pending</p></div>
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-4 rounded-xl text-center"><p class="text-2xl font-black text-red-500" id="guestDeclined">0</p><p class="text-xs text-[#5e8d8d] mt-1">Declined</p></div>
+                </div>
+                
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-xl p-5 mb-8">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-sm">Guest Status Breakdown</h4>
+                        <div class="flex gap-4 text-[10px] font-bold uppercase tracking-wider text-[#5e8d8d]">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Confirmed</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-400"></span> Pending</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Declined</span>
+                        </div>
+                    </div>
+                    <div class="w-full h-4 bg-[#f0f5f5] dark:bg-white/10 rounded-full overflow-hidden flex shadow-inner">
+                        <div class="bg-green-500 h-full transition-all duration-1000" id="gmBarConfirmed" style="width:0%"></div>
+                        <div class="bg-orange-400 h-full transition-all duration-1000" id="gmBarPending" style="width:0%"></div>
+                        <div class="bg-red-500 h-full transition-all duration-1000" id="gmBarDeclined" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl overflow-hidden pb-[100px]">
+                    <div class="p-4 border-b border-[#dae7e7] dark:border-white/10 flex gap-3">
+                        <input id="guestSearch" type="text" placeholder="Search guests..." class="flex-1 bg-gray-50 dark:bg-white/5 border border-[#e0e8e8] dark:border-white/10 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary dark:text-white">
+                        <select id="guestSideFilter" class="bg-gray-50 dark:bg-white/5 border border-[#e0e8e8] dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none dark:text-white">
+                            <option value="">All Sides</option><option value="Bride">Bride's Side</option><option value="Groom">Groom's Side</option>
+                        </select>
+                    </div>
+                    <table class="w-full text-sm relative">
+                        <thead class="bg-gray-50 dark:bg-white/5 text-[10px] uppercase text-[#5e8d8d] font-bold">
+                            <tr><th class="px-4 py-3 text-left">Name</th><th class="px-4 py-3 text-left">Contact</th><th class="px-4 py-3 text-center">RSVP</th><th class="px-4 py-3 text-center">Side</th><th class="px-4 py-3 text-right">Actions</th></tr>
+                        </thead>
+                        <tbody id="guestTableBody" class="divide-y divide-[#dae7e7] dark:divide-white/5"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-budget" class="page-section">
+                <h2 class="text-3xl font-black mb-6">Budget Tracker</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-6 rounded-xl text-center">
+                        <p class="text-xs font-bold uppercase text-[#5e8d8d] mb-1">Total Budget</p>
+                        <p class="text-3xl font-black text-primary dark:text-accent-gold"><span class="currency-symbol">₹</span><span id="db-totalBudget">0</span></p>
+                    </div>
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-6 rounded-xl text-center">
+                        <p class="text-xs font-bold uppercase text-[#5e8d8d] mb-1">Total Spent</p>
+                        <p class="text-3xl font-black text-red-500"><span class="currency-symbol">₹</span><span id="db-totalSpent">0</span></p>
+                    </div>
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 p-6 rounded-xl text-center">
+                        <p class="text-xs font-bold uppercase text-[#5e8d8d] mb-1">Remaining</p>
+                        <p class="text-3xl font-black text-green-600"><span class="currency-symbol">₹</span><span id="db-remaining">0</span></p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 mb-6 flex flex-col md:flex-row items-center gap-8">
+                    <div class="relative w-48 h-48 rounded-full flex-shrink-0 shadow-inner" id="budgetDonut" style="background: conic-gradient(rgba(150, 160, 160, 0.2) 0% 100%);">
+                        <div class="absolute inset-2 bg-white dark:bg-[#0f2323] rounded-full flex flex-col items-center justify-center shadow-lg">
+                            <span class="text-[10px] font-bold text-[#5e8d8d] uppercase tracking-wider">Total Spent</span>
+                            <span class="text-xl font-black mt-1" id="donutTotalSpent">₹0</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 w-full" id="budgetLegend">
+                        <p class="text-[#5e8d8d] text-sm">Set a budget and add expenses to generate your financial graph.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 mb-6">
+                    <div class="flex gap-3 mb-4">
+                        <input id="db-budgetInput" type="number" placeholder="Set Total Budget" class="flex-1 px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary">
+                        <button onclick="dbSetBudget()" class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary/90">Set Budget</button>
+                    </div>
+                    <div class="flex gap-3">
+                        <input id="db-expName" type="text" placeholder="Expense name (e.g. Photography)" class="flex-1 px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary">
+                        <input id="db-expAmount" type="number" placeholder="Amount" class="w-40 px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary">
+                        <button onclick="dbAddExpense()" class="bg-accent-gold text-white px-6 py-2.5 rounded-xl font-bold hover:bg-accent-gold/90">Add</button>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 dark:bg-white/5 text-[10px] uppercase text-[#5e8d8d] font-bold">
+                            <tr><th class="px-4 py-3 text-left">Category</th><th class="px-4 py-3 text-right">Amount</th><th class="px-4 py-3 text-right">Actions</th></tr>
+                        </thead>
+                        <tbody id="db-expList" class="divide-y divide-[#dae7e7] dark:divide-white/5"><tr><td colspan="3" class="px-4 py-8 text-center text-[#5e8d8d]">No expenses added yet</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-timeline" class="page-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-black">Event Timeline</h2>
+                </div>
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 mb-6">
+                    <div class="flex flex-wrap gap-3">
+                        <input id="tl-day" type="text" placeholder="Event Date/Day (e.g. Nov 14)" class="flex-1 min-w-[150px] px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary">
+                        <input id="tl-time" type="time" class="px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary">
+                        <input id="tl-desc" type="text" placeholder="Event Name (e.g. Barat Entrance)" class="flex-1 min-w-[200px] px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary">
+                        <button onclick="tlAddEvent()" class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary/90">Add Event</button>
+                    </div>
+                </div>
+                <div id="tl-container" class="space-y-6">
+                    <p class="text-[#5e8d8d] text-center py-12">No events added yet. Add your first event above!</p>
+                </div>
+            </div>
+
+            <div id="page-checklist" class="page-section">
+                <header class="flex justify-between items-center mb-8 flex-wrap gap-4">
+                    <div>
+                        <h2 class="text-3xl font-black tracking-tight">Wedding Checklist</h2>
+                        <p class="text-[#5e8d8d] dark:text-[#a3c2c2]">Keep track of all your wedding planning tasks.</p>
+                    </div>
+                </header>
+
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 mb-6">
+                    <div class="flex flex-wrap gap-3">
+                        <input id="chk-title" type="text" placeholder="Task title (e.g. Book Caterer)" class="flex-1 min-w-[200px] px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary">
+                        <select id="chk-category" class="px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary text-black">
+                            <option value="Venue">Venue</option>
+                            <option value="Catering">Catering</option>
+                            <option value="Photography">Photography</option>
+                            <option value="Attire">Attire</option>
+                            <option value="Decoration">Decoration</option>
+                            <option value="General" selected>General</option>
+                        </select>
+                        <input id="chk-duedate" type="date" class="px-4 py-2.5 border border-[#e0e8e8] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-white outline-none focus:ring-2 focus:ring-primary">
+                        <button onclick="chkAddItem()" class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary/90">Add Task</button>
+                    </div>
+                </div>
+
+                <div id="checklist-container" class="space-y-3">
+                    <p class="text-[#5e8d8d] text-center py-12">No checklist items yet. Add one above!</p>
+                </div>
+            </div>
+
+            <div id="page-bookings" class="page-section">
+                <header class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-black tracking-tight">My Bookings</h2>
+                        <p class="text-[#5e8d8d] dark:text-[#a3c2c2]">Manage your hired vendors and view important details.</p>
+                    </div>
+                    <button onclick="showPage('marketplace')" class="text-xs font-bold text-primary border border-primary/20 px-4 py-2 rounded-full flex items-center gap-2 hover:bg-primary/5 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">add_circle</span> Book More
+                    </button>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col">
+                        <div class="flex justify-between items-start mb-4 border-b border-[#dae7e7] dark:border-white/10 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                                    <span class="material-symbols-outlined">holiday_village</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-base leading-tight">The Grand Taj Palace</h3>
+                                    <p class="text-[10px] font-bold text-accent-gold uppercase tracking-wider mt-0.5">Venue</p>
+                                </div>
+                            </div>
+                            <span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold flex-shrink-0">Confirmed</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4 text-sm flex-1">
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Booking ID</p>
+                                <p class="font-medium text-xs">#BKG-10492</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Event Date</p>
+                                <p class="font-medium text-xs">Nov 14, 2026</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Total Amount</p>
+                                <p class="font-bold text-xs"><span class="currency-symbol">₹</span> 15,00,000</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Advance Paid</p>
+                                <p class="font-bold text-xs text-green-600"><span class="currency-symbol">₹</span> 5,00,000</p>
+                            </div>
+                        </div>
+                        <div class="bg-[#f0f5f5] dark:bg-white/5 p-3 rounded-lg mb-5 border border-[#dae7e7] dark:border-white/5">
+                            <p class="text-[10px] font-bold mb-1 flex items-center gap-1 text-[#101818] dark:text-white uppercase"><span class="material-symbols-outlined text-[14px] text-primary">info</span> Important Info</p>
+                            <p class="text-xs text-[#5e8d8d] leading-relaxed">Check-in at 10:00 AM. Decor setup allowed from 12:00 PM. Final balance due on Nov 1, 2026.</p>
+                        </div>
+                        <div class="flex gap-2 mt-auto">
+                            <button onclick="showToast('Downloading Invoice...')" class="flex-1 bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">download</span> Invoice
+                            </button>
+                            <button onclick="showToast('Contacting Vendor...')" class="flex-1 bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">call</span> Contact
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col">
+                        <div class="flex justify-between items-start mb-4 border-b border-[#dae7e7] dark:border-white/10 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-accent-gold/10 flex items-center justify-center text-accent-gold flex-shrink-0">
+                                    <span class="material-symbols-outlined">photo_camera</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-base leading-tight">Vogue Visuals</h3>
+                                    <p class="text-[10px] font-bold text-accent-gold uppercase tracking-wider mt-0.5">Photography</p>
+                                </div>
+                            </div>
+                            <span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold flex-shrink-0">Confirmed</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4 text-sm flex-1">
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Booking ID</p>
+                                <p class="font-medium text-xs">#BKG-10508</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Event Date</p>
+                                <p class="font-medium text-xs">Nov 13-14, 2026</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Total Amount</p>
+                                <p class="font-bold text-xs"><span class="currency-symbol">₹</span> 4,70,000</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Advance Paid</p>
+                                <p class="font-bold text-xs text-green-600"><span class="currency-symbol">₹</span> 1,50,000</p>
+                            </div>
+                        </div>
+                        <div class="bg-[#f0f5f5] dark:bg-white/5 p-3 rounded-lg mb-5 border border-[#dae7e7] dark:border-white/5">
+                            <p class="text-[10px] font-bold mb-1 flex items-center gap-1 text-[#101818] dark:text-white uppercase"><span class="material-symbols-outlined text-[14px] text-primary">info</span> Important Info</p>
+                            <p class="text-xs text-[#5e8d8d] leading-relaxed">Includes 2 traditional, 2 candid photographers, and drone coverage. Pre-wedding shoot pending scheduling.</p>
+                        </div>
+                        <div class="flex gap-2 mt-auto">
+                            <button onclick="showToast('Downloading Invoice...')" class="flex-1 bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">download</span> Invoice
+                            </button>
+                            <button onclick="showToast('Contacting Vendor...')" class="flex-1 bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">call</span> Contact
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col">
+                        <div class="flex justify-between items-start mb-4 border-b border-[#dae7e7] dark:border-white/10 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 flex-shrink-0">
+                                    <span class="material-symbols-outlined">restaurant_menu</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-base leading-tight">Royal Thali Caterers</h3>
+                                    <p class="text-[10px] font-bold text-accent-gold uppercase tracking-wider mt-0.5">Catering</p>
+                                </div>
+                            </div>
+                            <span class="bg-orange-100 text-orange-700 text-[10px] px-2 py-1 rounded-full font-bold flex-shrink-0">Pending Bal.</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4 text-sm flex-1">
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Booking ID</p>
+                                <p class="font-medium text-xs">#BKG-10621</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Event Date</p>
+                                <p class="font-medium text-xs">Nov 14, 2026</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Total Amount</p>
+                                <p class="font-bold text-xs"><span class="currency-symbol">₹</span> 12,00,000</p>
+                            </div>
+                            <div>
+                                <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Balance Due</p>
+                                <p class="font-bold text-xs text-orange-600"><span class="currency-symbol">₹</span> 8,00,000</p>
+                            </div>
+                        </div>
+                        <div class="bg-[#f0f5f5] dark:bg-white/5 p-3 rounded-lg mb-5 border border-[#dae7e7] dark:border-white/5">
+                            <p class="text-[10px] font-bold mb-1 flex items-center gap-1 text-[#101818] dark:text-white uppercase"><span class="material-symbols-outlined text-[14px] text-primary">warning</span> Next Action</p>
+                            <p class="text-xs text-[#5e8d8d] leading-relaxed">Menu tasting scheduled for Oct 15. Final guest count to be submitted by Nov 5.</p>
+                        </div>
+                        <div class="flex gap-2 mt-auto">
+                            <button onclick="showToast('Downloading Invoice...')" class="flex-1 bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">download</span> Invoice
+                            </button>
+                            <button onclick="showToast('Processing Payment...')" class="flex-1 bg-accent-gold text-white py-2 rounded-xl text-xs font-bold hover:bg-accent-gold/90 transition-colors flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">payments</span> Pay Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-settings" class="page-section">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-black tracking-tight">Settings</h2>
+                    <p class="text-[#5e8d8d] dark:text-[#a3c2c2]">Manage your application preferences and account settings.</p>
+                </header>
+
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl overflow-hidden max-w-3xl">
+                    
+                    <div class="p-6 border-b border-[#dae7e7] dark:border-white/10">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary dark:text-accent-gold">tune</span> Application Preferences
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-sm">Dashboard Currency</p>
+                                    <p class="text-xs text-[#5e8d8d] mt-0.5">Select the currency used in Budget Tracker and Marketplace</p>
+                                </div>
+                                <select id="settingCurrency" onchange="updateGlobalCurrency()" class="w-32 px-3 py-2 border border-[#dae7e7] dark:border-white/10 rounded-lg bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white text-sm">
+                                    <option value="₹">INR (₹)</option>
+                                    <option value="$">USD ($)</option>
+                                    <option value="€">EUR (€)</option>
+                                    <option value="£">GBP (£)</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-sm">Dark Mode</p>
+                                    <p class="text-xs text-[#5e8d8d] mt-0.5">Toggle dark theme appearance</p>
+                                </div>
+                                <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" id="settingThemeToggle" onchange="toggleAppTheme()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0" />
+                                    <label for="settingThemeToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 border-b border-[#dae7e7] dark:border-white/10">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary dark:text-accent-gold">notifications</span> Notification Settings
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-sm">Email Notifications</p>
+                                    <p class="text-xs text-[#5e8d8d] mt-0.5">Receive updates about vendor messages and RSVPs</p>
+                                </div>
+                                <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" id="toggleEmailNotif" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0" />
+                                    <label for="toggleEmailNotif" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-sm">WhatsApp Auto-Follow-up</p>
+                                    <p class="text-xs text-[#5e8d8d] mt-0.5">Allow AI to send RSVP reminders to pending guests</p>
+                                </div>
+                                <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" id="toggleWaNotif" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0" />
+                                    <label for="toggleWaNotif" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary dark:text-accent-gold">security</span> Privacy & Data
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-sm">Guest List Visibility</p>
+                                    <p class="text-xs text-[#5e8d8d] mt-0.5">Who can view your full guest list</p>
+                                </div>
+                                <select class="w-40 px-3 py-2 border border-[#dae7e7] dark:border-white/10 rounded-lg bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white text-sm">
+                                    <option value="private">Only Me</option>
+                                    <option value="collaborators" selected>Collaborators</option>
+                                    <option value="vendors">Vendors (Limited)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="pt-4 mt-4 border-t border-[#dae7e7] dark:border-white/10">
+                                <button onclick="showToast('Data exported successfully')" class="text-sm font-bold text-primary dark:text-accent-gold hover:underline flex items-center gap-1 mb-3">
+                                    <span class="material-symbols-outlined text-[16px]">download</span> Download My Account Data
+                                </button>
+                                <button onclick="confirm('Are you sure you want to permanently delete your account and all event data? This action cannot be undone.')" class="text-sm font-bold text-red-500 hover:underline flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">delete_forever</span> Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="page-about" class="page-section">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-black tracking-tight">About Eazeevent</h2>
+                </header>
+                <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl overflow-hidden max-w-3xl p-8">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
+                            <span class="material-symbols-outlined text-white text-3xl">auto_awesome</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-black text-[#101818] dark:text-white">Eazeevent</h3>
+                            <p class="text-sm text-primary dark:text-accent-gold font-bold">Version 1.0.0 (Beta)</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-[#5e8d8d] dark:text-gray-300 leading-relaxed mb-6">
+                        Eazeevent is your all-in-one intelligent event planning dashboard. We believe that organizing life's biggest celebrations should be a joy, not a stressful chore. Our platform leverages smart automation, seamless financial tracking, and AI-driven vendor matchmaking to give you complete control over your special day.
+                    </p>
+                    <div class="space-y-4 border-t border-[#dae7e7] dark:border-white/10 pt-6">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-accent-gold mt-0.5">check_circle</span>
+                            <div>
+                                <p class="font-bold text-sm">Smart Guest Management</p>
+                                <p class="text-xs text-[#5e8d8d]">Automated RSVP tracking and status visualization.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-accent-gold mt-0.5">check_circle</span>
+                            <div>
+                                <p class="font-bold text-sm">Dynamic Budget Tracker</p>
+                                <p class="text-xs text-[#5e8d8d]">Real-time financial analytics and payment tracking.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-accent-gold mt-0.5">check_circle</span>
+                            <div>
+                                <p class="font-bold text-sm">AI Vendor Matchmaking</p>
+                                <p class="text-xs text-[#5e8d8d]">Intelligent recommendations based on your unique style and budget constraints.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-[#5e8d8d] mt-8 text-center uppercase tracking-widest font-bold">
+                        © 2026 Eazeevent Technologies. All rights reserved.
+                    </p>
+                </div>
+            </div>
+
+            <div id="page-support" class="page-section">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-black tracking-tight">Help & Support</h2>
+                    <p class="text-[#5e8d8d] dark:text-[#a3c2c2]">We are here to help make your planning process flawless.</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl">
+                    <div class="space-y-6">
+                        <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-primary transition-colors cursor-pointer" onclick="showToast('Opening Email Client...')">
+                            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary flex-shrink-0">
+                                <span class="material-symbols-outlined">mail</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base">Email Support</h3>
+                                <p class="text-xs text-[#5e8d8d] mt-1 mb-2">Get help within 24 hours.</p>
+                                <p class="text-sm font-bold text-primary dark:text-accent-gold">support@eazeevent.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-primary transition-colors cursor-pointer" onclick="showToast('Initiating Phone Call...')">
+                            <div class="w-12 h-12 bg-accent-gold/10 rounded-xl flex items-center justify-center text-accent-gold flex-shrink-0">
+                                <span class="material-symbols-outlined">support_agent</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base">Call our Advisors</h3>
+                                <p class="text-xs text-[#5e8d8d] mt-1 mb-2">Available Mon-Sat, 9 AM to 7 PM.</p>
+                                <p class="text-sm font-bold text-primary dark:text-accent-gold">+91 1800-EAZE-123</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6">
+                            <h3 class="font-bold text-base mb-4 border-b border-[#dae7e7] dark:border-white/10 pb-2">Frequently Asked Questions</h3>
+                            <div class="space-y-4">
+                                <details class="group cursor-pointer">
+                                    <summary class="font-medium text-sm text-[#101818] dark:text-white outline-none flex justify-between items-center">
+                                        How do I export my guest list?
+                                        <span class="material-symbols-outlined text-[#5e8d8d] transition-transform group-open:rotate-180">expand_more</span>
+                                    </summary>
+                                    <p class="text-xs text-[#5e8d8d] mt-2 leading-relaxed">You can export your guest list by navigating to Settings -> Privacy & Data, and clicking "Download My Account Data".</p>
+                                </details>
+                                <details class="group cursor-pointer">
+                                    <summary class="font-medium text-sm text-[#101818] dark:text-white outline-none flex justify-between items-center">
+                                        Can I change my dashboard currency?
+                                        <span class="material-symbols-outlined text-[#5e8d8d] transition-transform group-open:rotate-180">expand_more</span>
+                                    </summary>
+                                    <p class="text-xs text-[#5e8d8d] mt-2 leading-relaxed">Yes, go to Settings -> Application Preferences to change your default currency symbol.</p>
+                                </details>
+                                <details class="group cursor-pointer">
+                                    <summary class="font-medium text-sm text-[#101818] dark:text-white outline-none flex justify-between items-center">
+                                        How does AI Vendor Matchmaking work?
+                                        <span class="material-symbols-outlined text-[#5e8d8d] transition-transform group-open:rotate-180">expand_more</span>
+                                    </summary>
+                                    <p class="text-xs text-[#5e8d8d] mt-2 leading-relaxed">Our AI analyzes your total budget, remaining funds, event date, and specific preferences to suggest the best-rated vendors available in your area.</p>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6 h-fit">
+                        <h3 class="text-lg font-bold mb-1">Submit a Support Ticket</h3>
+                        <p class="text-xs text-[#5e8d8d] mb-6">Describe your issue and our team will investigate.</p>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Subject</label>
+                                <input type="text" id="ticketSubject" placeholder="What is this regarding?" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white text-sm transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Category</label>
+                                <select id="ticketCategory" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white text-sm transition-all text-black">
+                                    <option>Billing & Payments</option>
+                                    <option>Vendor Issues</option>
+                                    <option>Technical Bug</option>
+                                    <option>Feature Request</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Description</label>
+                                <textarea id="ticketDescription" rows="4" placeholder="Please provide details..." class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white text-sm transition-all resize-none"></textarea>
+                            </div>
+                            <button onclick="submitSupportTicket()" class="w-full py-3 bg-gradient-to-r from-primary to-[#006666] text-white font-bold rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">send</span> Submit Ticket
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<div id="editProfileModal" class="fixed inset-0 bg-[#0f2323]/80 backdrop-blur-sm z-[100] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="bg-white dark:bg-[#1d3a3a] p-8 rounded-2xl w-full max-w-md transform scale-95 transition-transform duration-300 shadow-2xl border border-[#dae7e7] dark:border-white/10" id="editProfileModalContent">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-[#101818] dark:text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary dark:text-accent-gold">person</span> Edit Profile
+            </h3>
+            <button onclick="closeEditProfileModal()" class="text-[#5e8d8d] hover:text-red-500 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <div class="flex justify-center mb-6 relative">
+            <div class="relative inline-block group cursor-pointer" onclick="document.getElementById('profileImageInput').click()">
+                <img id="editProfileImagePreview" src="https://i.pravatar.cc/100?u=ananya" alt="Avatar" class="h-24 w-24 rounded-full border-4 border-primary/20 object-cover">
+                <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="material-symbols-outlined text-white">photo_camera</span>
+                </div>
+                <input type="file" id="profileImageInput" accept="image/*" class="hidden" onchange="previewProfileImage(event)">
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Full Name</label>
+                <input type="text" id="editProfileName" value="Ananya Sharma" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white transition-all">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Email Address</label>
+                <input type="email" id="editProfileEmail" value="ananya.sharma@example.com" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white transition-all">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Phone Number</label>
+                    <input type="tel" id="editProfilePhone" value="+91 98765 43210" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Address</label>
+                    <input type="text" id="editProfileAddress" value="New Delhi, India" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white transition-all">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Role / Status</label>
+                <select id="editProfileRole" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white transition-all">
+                    <option value="Bride-to-be 💍" selected>Bride-to-be 💍</option>
+                    <option value="Groom-to-be 🤵">Groom-to-be 🤵</option>
+                    <option value="Event Planner 📋">Event Planner 📋</option>
+                    <option value="Family Member 👨‍👩‍👧‍👦">Family Member 👨‍👩‍👧‍👦</option>
+                </select>
+            </div>
+            
+            <div class="pt-4 flex justify-end gap-3">
+                <button onclick="closeEditProfileModal()" class="px-5 py-2.5 text-[#5e8d8d] font-bold hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors">Cancel</button>
+                <button onclick="saveProfileData()" class="px-6 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/30">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="addGuestModal" class="fixed inset-0 bg-[#0f2323]/80 backdrop-blur-sm z-[100] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="bg-white dark:bg-[#1d3a3a] p-8 rounded-2xl w-full max-w-md transform scale-95 transition-transform duration-300 shadow-2xl border border-[#dae7e7] dark:border-white/10" id="addGuestModalContent">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-[#101818] dark:text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary dark:text-accent-gold">person_add</span> Add New Guest
+            </h3>
+            <button onclick="closeAddGuestModal()" class="text-[#5e8d8d] hover:text-red-500 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Guest Name</label>
+                <input type="text" id="newGuestName" placeholder="e.g. Rohan & Family" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white transition-all">
+            </div>
+            
+            <div>
+                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Contact Number</label>
+                <input type="tel" id="newGuestContact" placeholder="e.g. +91 98765 43210" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white transition-all">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-[#5e8d8d] uppercase mb-1">Side</label>
+                <select id="newGuestSide" class="w-full px-4 py-3 border border-[#dae7e7] dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 outline-none focus:ring-2 focus:ring-primary dark:text-white transition-all">
+                    <option value="Bride">Bride's Side</option>
+                    <option value="Groom">Groom's Side</option>
+                </select>
+            </div>
+            <div class="pt-4 flex justify-end gap-3">
+                <button onclick="closeAddGuestModal()" class="px-5 py-2.5 text-[#5e8d8d] font-bold hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors">Cancel</button>
+                <button onclick="addGuest()" class="px-6 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/30">Save Guest</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
