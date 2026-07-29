@@ -155,19 +155,37 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         "email": user.email
     }
 
-import random
-reset_otps = {}  # In-memory dictionary for OTP store
+import secrets
+import time
+reset_otps = {}  # In-memory dictionary for OTP store: {email: {"otp": otp, "expires_at": expires_at, "attempts": attempts}}
+otp_request_timestamps = {}  # Rate-limit store: {email: last_request_time}
+OTP_REQUEST_COOLDOWN_SECONDS = 60  # Minimum seconds between OTP requests per email
 
 @router.post("/password-reset/request")
 def request_password_reset(payload: PasswordResetRequest, db: Session = Depends(get_db)):
+    # Rate-limit OTP requests: max 1 request per email per 60 seconds
+    now = time.time()
+    last_request = otp_request_timestamps.get(payload.email, 0)
+    if now - last_request < OTP_REQUEST_COOLDOWN_SECONDS:
+        wait_seconds = int(OTP_REQUEST_COOLDOWN_SECONDS - (now - last_request))
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Please wait {wait_seconds} seconds before requesting another reset code."
+        )
+    otp_request_timestamps[payload.email] = now
+    
     user = db.query(User).filter(User.email == payload.email).first()
     if not user:
         # Prevent email enumeration by returning a success message regardless
         return {"message": "If this email is registered, a password reset code has been sent."}
         
-    # Generate a secure random 6-digit OTP
-    otp = f"{random.randint(100000, 999999)}"
-    reset_otps[payload.email] = otp
+    # Generate a cryptographically secure random 6-digit OTP
+    otp = f"{secrets.randbelow(900000) + 100000}"
+    reset_otps[payload.email] = {
+        "otp": otp,
+        "expires_at": time.time() + 600,  # 10 minutes expiry
+        "attempts": 0
+    }
     
     # Send email
     send_notification_email(
@@ -180,11 +198,34 @@ def request_password_reset(payload: PasswordResetRequest, db: Session = Depends(
 
 @router.post("/password-reset/confirm")
 def confirm_password_reset(payload: PasswordResetConfirm, db: Session = Depends(get_db)):
-    stored_otp = reset_otps.get(payload.email)
-    if not stored_otp or stored_otp != payload.otp:
+    otp_data = reset_otps.get(payload.email)
+    if not otp_data:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired verification code."
+            detail="Verification code not found or expired. Please request a new one."
+        )
+        
+    # Check expiry
+    if time.time() > otp_data["expires_at"]:
+        reset_otps.pop(payload.email, None)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Verification code has expired. Please request a new one."
+        )
+        
+    # Increment attempts and check limit
+    otp_data["attempts"] += 1
+    if otp_data["attempts"] > 5:
+        reset_otps.pop(payload.email, None)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Too many failed verification attempts. Please request a new code."
+        )
+        
+    if otp_data["otp"] != payload.otp:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid verification code."
         )
         
     user = db.query(User).filter(User.email == payload.email).first()
@@ -205,3 +246,4 @@ def confirm_password_reset(payload: PasswordResetConfirm, db: Session = Depends(
     )
     
     return {"message": "Password reset successfully."}
+

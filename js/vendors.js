@@ -1,3 +1,13 @@
+function escapeHtml(unsafe) {
+    if (unsafe === undefined || unsafe === null) return "";
+    return String(unsafe)
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 // ============ VENDOR DATA ============
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -106,10 +116,10 @@ function renderVendors(vendors) {
     grid.innerHTML = vendors.map(v => `
 <div class="vendor-card group bg-white dark:bg-[#1d3a3a] rounded-2xl overflow-hidden border border-[#e0e8e8] dark:border-[#2a4a4a] hover:shadow-xl hover:border-primary/20 dark:hover:border-accent-gold/30 transition-all flex flex-col cursor-pointer" onclick="openVendorModal(${v.id})">
     <div class="relative aspect-[4/3] overflow-hidden">
-        <img alt="${v.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="${v.image}" onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800'"/>
+        <img alt="${escapeHtml(v.title)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="${escapeHtml(v.image)}" onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800'"/>
         <div class="absolute top-4 left-4 flex items-center gap-2 pointer-events-none">
             ${v.verified ? `<div class="verified-badge text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-sm text-white flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">verified</span> Verified</div>` : ''}
-            ${v.badge ? `<div class="bg-white/90 dark:bg-[#101818]/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-[#101818] dark:text-white uppercase">${v.badge}</div>` : ''}
+            ${v.badge ? `<div class="bg-white/90 dark:bg-[#101818]/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-[#101818] dark:text-white uppercase">${escapeHtml(v.badge)}</div>` : ''}
         </div>
         <button class="fav-btn absolute top-4 right-4 size-8 bg-white/20 hover:bg-white/40 backdrop-blur rounded-full flex items-center justify-center transition-colors z-10" onclick="toggleFav(event, ${v.id})" title="Save to wishlist">
             <span class="heart-icon material-symbols-outlined text-white text-xl ${favorites.has(v.id) ? 'heart-filled' : ''}">favorite</span>
@@ -117,12 +127,12 @@ function renderVendors(vendors) {
     </div>
     <div class="p-5 flex flex-col flex-grow">
         <div class="flex items-start justify-between mb-1">
-            <h3 class="vendor-title font-bold text-lg leading-tight group-hover:text-primary dark:group-hover:text-accent-gold transition-colors">${v.title}</h3>
+            <h3 class="vendor-title font-bold text-lg leading-tight group-hover:text-primary dark:group-hover:text-accent-gold transition-colors">${escapeHtml(v.title)}</h3>
             <div class="flex items-center gap-1 bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded text-green-700 dark:text-green-400 font-bold text-xs flex-shrink-0 ml-2">
                 <span>${v.rating}</span><span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1">star</span>
             </div>
         </div>
-        <p class="vendor-desc text-[#5e8d8d] text-sm mb-4">${v.desc}</p>
+        <p class="vendor-desc text-[#5e8d8d] text-sm mb-4">${escapeHtml(v.desc)}</p>
         <div class="flex items-center justify-between pt-4 border-t border-[#f0f5f5] dark:border-[#2a4a4a] mt-auto">
             <div>
                 <p class="text-[10px] uppercase font-bold text-[#5e8d8d] tracking-wider">Starting From</p>
@@ -153,6 +163,29 @@ async function openVendorModal(id) {
     document.getElementById('vendorModalDesc').textContent = v.desc;
     document.getElementById('vendorModalPrice').textContent = formatPrice(v.price, v.category);
     document.getElementById('vendorModalLoc').textContent = v.location;
+    
+    // Set inquiry defaults
+    const budgetInput = document.getElementById('inquiryBudget');
+    if (budgetInput) {
+        budgetInput.value = v.price;
+    }
+    const dateInput = document.getElementById('inquiryEventDate');
+    if (dateInput) {
+        let defaultDate = "";
+        const loggedInUserStr = sessionStorage.getItem('eazeevent_logged_in_customer');
+        if (loggedInUserStr) {
+            try {
+                const user = JSON.parse(loggedInUserStr);
+                if (user.wedding_date) {
+                    defaultDate = user.wedding_date;
+                }
+            } catch (err) {}
+        }
+        if (!defaultDate) {
+            defaultDate = new Date(Date.now() + 150 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        }
+        dateInput.value = defaultDate;
+    }
     document.getElementById('vendorModalRating').innerHTML = `${v.rating} <span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1">star</span>`;
     document.getElementById('vendorModalBadge').innerHTML = v.verified ? `<span class="verified-badge text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded text-white flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">verified</span> Verified</span>` : '';
     
@@ -164,7 +197,7 @@ async function openVendorModal(id) {
                 const pkgsList = typeof v.packages === 'string' ? JSON.parse(v.packages) : v.packages;
                 pkgsContainer.innerHTML = pkgsList.map(p => `
                     <div class="flex justify-between items-center bg-gray-50 dark:bg-[#102a2a] p-3 rounded-lg border border-transparent hover:border-accent-gold/20 transition-all">
-                        <span class="font-bold text-primary dark:text-[#bfc8c8]">${p.name}</span>
+                        <span class="font-bold text-primary dark:text-[#bfc8c8]">${escapeHtml(p.name)}</span>
                         <span class="font-black text-accent-gold">${formatPrice(p.price, v.category)}</span>
                     </div>
                 `).join('');
@@ -189,14 +222,14 @@ async function openVendorModal(id) {
                 reviewsContainer.innerHTML = reviews.map(r => `
                     <div class="bg-gray-50 dark:bg-[#102a2a] p-3 rounded-lg space-y-1">
                         <div class="flex justify-between items-center font-bold">
-                            <span class="text-primary dark:text-white">${r.reviewer_name}</span>
+                            <span class="text-primary dark:text-white">${escapeHtml(r.reviewer_name)}</span>
                             <span class="flex items-center text-accent-gold gap-0.5">${r.rating} <span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1">star</span></span>
                         </div>
-                        <p class="text-on-surface-variant italic">"${r.text}"</p>
+                        <p class="text-on-surface-variant italic">"${escapeHtml(r.text)}"</p>
                         ${r.replied && r.reply_text ? `
                             <div class="ml-4 mt-2 border-l-2 border-primary/20 pl-3 py-1 bg-primary/5 dark:bg-white/5 rounded text-[11px]">
                                 <span class="font-bold text-primary dark:text-accent-gold block mb-0.5">Vendor reply:</span>
-                                <p class="text-on-surface-variant italic">"${r.reply_text}"</p>
+                                <p class="text-on-surface-variant italic">"${escapeHtml(r.reply_text)}"</p>
                             </div>
                         ` : ''}
                     </div>
@@ -230,15 +263,21 @@ async function sendInquiry() {
     const v = ALL_VENDORS.find(x => x.id === activeVendorId);
     if (!v) return;
     
+    const eventDateInput = document.getElementById('inquiryEventDate');
+    const budgetInput = document.getElementById('inquiryBudget');
+    
+    const eventDate = eventDateInput ? eventDateInput.value : "2026-11-14";
+    const budget = budgetInput && budgetInput.value ? parseFloat(budgetInput.value) : v.price;
+    
     try {
         await apiFetch('/api/customer/inquiries', {
             method: 'POST',
             body: JSON.stringify({
                 vendor_id: activeVendorId,
                 pkg: `Custom ${v.category} Package`,
-                date: "2026-11-14",
+                date: eventDate,
                 location: v.location,
-                budget: v.price
+                budget: budget
             })
         });
         

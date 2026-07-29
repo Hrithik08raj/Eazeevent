@@ -196,6 +196,13 @@ class VendorProfileUpdate(BaseModel):
 class BoostRequest(BaseModel):
     plan_index: int
 
+class BoostVerifyRequest(BaseModel):
+    plan_index: int
+    razorpay_order_id: str
+    razorpay_payment_id: str
+    razorpay_signature: str
+
+
 # --- ADMIN SETTINGS & STATS ---
 class AdminSettingsOut(BaseModel):
     platform_name: str

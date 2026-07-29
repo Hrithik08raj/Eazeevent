@@ -1,15 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import shutil
 import uuid
 import os
+import time
+from collections import defaultdict
+
 from app.database import get_db
 from app.models import User, VendorProfile, Booking, Inquiry, Review, CustomerProfile, Transaction, BlockedDate
 from app.schemas import (
     VendorProfileOut, VendorProfileUpdate,
     BookingOut, InquiryOut, InquiryStatusUpdate,
-    ReviewOut, ReviewCreate, ReviewReply, TransactionOut, BoostRequest, BlockedDateOut, BlockedDateCreate
+    ReviewOut, ReviewCreate, ReviewReply, TransactionOut, BoostRequest, BoostVerifyRequest, BlockedDateOut, BlockedDateCreate
 )
 from app.deps import RoleChecker, get_current_user
 
@@ -352,6 +355,8 @@ def get_vendor_earnings_summary(current_user: User = Depends(vendor_guard), db: 
     total_pending = 0.0
     
     for t in txns:
+        if t.type != "deposit":
+            continue
         # Payout is amount minus platform commission
         net_amount = t.amount * (1.0 - comm_rate / 100.0)
         if t.status == "Released":
@@ -368,9 +373,45 @@ def get_vendor_earnings_summary(current_user: User = Depends(vendor_guard), db: 
         "currency_symbol": currency
     }
 
-@router.post("/portal/boost")
-def activate_boost(
+from app.config import settings
+import razorpay
+import datetime
+
+@router.post("/portal/boost/create-order")
+def create_boost_order(
     payload: BoostRequest,
+    current_user: User = Depends(vendor_guard),
+    db: Session = Depends(get_db)
+):
+    prices = [999.0, 1799.0, 2999.0]
+    if payload.plan_index < 0 or payload.plan_index >= len(prices):
+        raise HTTPException(status_code=400, detail="Invalid plan selected.")
+    amount = prices[payload.plan_index]
+    try:
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        amount_paise = int(amount * 100)
+        order_data = {
+            "amount": amount_paise,
+            "currency": "INR",
+            "receipt": f"receipt_boost_{current_user.id}_{payload.plan_index}",
+            "payment_capture": 1
+        }
+        order = client.order.create(data=order_data)
+        return {
+            "order_id": order["id"],
+            "amount": amount,
+            "currency": "INR",
+            "key_id": settings.RAZORPAY_KEY_ID
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to create boost payment order: {str(e)}"
+        )
+
+@router.post("/portal/boost/verify-signature")
+def verify_boost_payment(
+    payload: BoostVerifyRequest,
     current_user: User = Depends(vendor_guard),
     db: Session = Depends(get_db)
 ):
@@ -381,34 +422,84 @@ def activate_boost(
     prices = [999.0, 1799.0, 2999.0]
     if payload.plan_index < 0 or payload.plan_index >= len(prices):
         raise HTTPException(status_code=400, detail="Invalid plan selected.")
-        
     amount = prices[payload.plan_index]
-    profile.is_boosted = True
     
-    # Create transaction record for platform payment
-    import datetime
-    new_txn = Transaction(
-        booking_id=0,
-        vendor_id=current_user.id,
-        amount=amount,
-        type="debit",
-        status="Released",
-        date=datetime.date.today().strftime("%b %d, %Y"),
-        client_name="Platform Boost Fee",
-        vendor_name=profile.business_name
-    )
-    db.add(new_txn)
-    db.commit()
-    return {"message": "Boost activated successfully."}
+    try:
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        params_dict = {
+            'razorpay_order_id': payload.razorpay_order_id,
+            'razorpay_payment_id': payload.razorpay_payment_id,
+            'razorpay_signature': payload.razorpay_signature
+        }
+        client.utility.verify_payment_signature(params_dict)
+        
+        # Signature is verified, boost vendor profile
+        profile.is_boosted = True
+        
+        # Create transaction record for platform payment with null booking_id
+        new_txn = Transaction(
+            booking_id=None,
+            vendor_id=current_user.id,
+            amount=amount,
+            type="debit",
+            status="Released",
+            date=datetime.date.today().strftime("%b %d, %Y"),
+            client_name="Platform Boost Fee",
+            vendor_name=profile.business_name
+        )
+        db.add(new_txn)
+        db.commit()
+        return {"status": "success", "message": "Boost activated successfully."}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Boost payment verification failed: {str(e)}"
+        )
+
+
+upload_rate_limits = defaultdict(list)
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".pdf", ".doc", ".docx"}
+ALLOWED_CONTENT_TYPES = {
+    "image/jpeg", "image/png", "application/pdf", 
+    "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+}
 
 @router.post("/upload")
 def upload_file(
+    request: Request,
     file: UploadFile = File(...)
 ):
+    # 1. Rate limiting by IP
+    client_ip = request.client.host if request.client else "unknown"
+    now = time.time()
+    upload_rate_limits[client_ip] = [t for t in upload_rate_limits[client_ip] if now - t < 60]
+    if len(upload_rate_limits[client_ip]) >= 10:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS, 
+            detail="Too many file uploads. Please try again later."
+        )
+    upload_rate_limits[client_ip].append(now)
+
+    # 2. File size validation (Max 5MB)
+    try:
+        file.file.seek(0, os.SEEK_END)
+        size = file.file.tell()
+        file.file.seek(0)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Cannot read file size.")
+        
+    MAX_SIZE = 5 * 1024 * 1024 # 5 MB
+    if size > MAX_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB.")
+
+    # 3. File type validation
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    if file_ext not in ALLOWED_EXTENSIONS or file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(status_code=400, detail="Unsupported file type.")
+
     upload_dir = "static/uploads"
     os.makedirs(upload_dir, exist_ok=True)
     
-    file_ext = os.path.splitext(file.filename)[1]
     new_filename = f"{uuid.uuid4()}{file_ext}"
     file_path = os.path.join(upload_dir, new_filename)
     
@@ -416,6 +507,7 @@ def upload_file(
         shutil.copyfileobj(file.file, buffer)
         
     return {"file_url": f"http://127.0.0.1:8000/static/uploads/{new_filename}"}
+
 
 @router.get("/portal/calendar/blocked", response_model=List[BlockedDateOut])
 def get_blocked_dates(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):

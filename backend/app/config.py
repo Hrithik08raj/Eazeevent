@@ -13,7 +13,7 @@ if env_path.exists():
 
 class Settings:
     PROJECT_NAME: str = "Eazeevent API"
-    DATABASE_URL: str = "sqlite:///./eazeevent.db"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./eazeevent.db")
     
     # Enforce SECRET_KEY from environment with no default fallback
     SECRET_KEY: str = os.getenv("SECRET_KEY")

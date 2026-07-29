@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: eazeevent_user
-      POSTGRES_PASSWORD: secure_postgres_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in a .env file at the project root — see .env.example}
       POSTGRES_DB: eazeevent
     ports:
       - "5432:5432"
@@ -22,10 +22,10 @@ services:
     restart: always
     ports:
       - "8000:8000"
+    env_file:
+      - ./backend/.env
     environment:
-      - DATABASE_URL=postgresql://eazeevent_user:secure_postgres_password@db:5432/eazeevent
-      - SECRET_KEY=generate_a_long_random_key_here_for_production
-      - API_BASE_URL=http://127.0.0.1:8000
+      - DATABASE_URL=postgresql://eazeevent_user:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in a .env file at the project root — see .env.example}@db:5432/eazeevent
     depends_on:
       - db
     volumes:

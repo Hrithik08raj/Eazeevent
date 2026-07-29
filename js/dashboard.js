@@ -1,3 +1,13 @@
+function escapeHtml(unsafe) {
+    if (unsafe === undefined || unsafe === null) return "";
+    return String(unsafe)
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 // ============ ROLE-BASED ACCESS CONTROL & API CLIENT ============
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -414,7 +424,7 @@ function dbUpdateUI() {
             return `<tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                 <td class="px-4 py-3 font-medium flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: ${color}"></span>
-                    ${e.name}
+                    ${escapeHtml(e.name)}
                 </td>
                 <td class="px-4 py-3 text-right font-bold">${globalCurrency}${e.amount.toLocaleString('en-IN')}</td>
                 <td class="px-4 py-3 text-right">
@@ -541,16 +551,16 @@ function tlRender() {
     
     container.innerHTML = days.map(day => `
         <div class="bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 rounded-2xl p-6">
-            <h4 class="font-bold text-accent-gold mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-sm">event</span>${day}</h4>
+            <h4 class="font-bold text-accent-gold mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-sm">event</span>${escapeHtml(day)}</h4>
             <div class="border-l-2 border-primary/20 ml-2 space-y-4">
                 ${tl_events[day].map((ev, i) => `
                     <div class="relative pl-6 flex items-start justify-between group">
                         <div>
                             <div class="absolute w-3 h-3 bg-primary rounded-full -left-[7px] top-1"></div>
-                            <span class="text-xs font-bold text-primary dark:text-accent-gold">${ev.time}</span>
-                            <p class="text-sm mt-0.5">${ev.desc}</p>
+                            <span class="text-xs font-bold text-primary dark:text-accent-gold">${escapeHtml(ev.time)}</span>
+                            <p class="text-sm mt-0.5">${escapeHtml(ev.desc)}</p>
                         </div>
-                        <button onclick="tlRemove('${day}', ${i})" class="text-red-400 hover:text-red-600 ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-sm">delete</span></button>
+                        <button onclick="tlRemove('${escapeHtml(day)}', ${i})" class="text-red-400 hover:text-red-600 ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-sm">delete</span></button>
                     </div>`).join('')}
             </div>
         </div>`).join('');
@@ -583,10 +593,10 @@ function renderChecklist() {
             <div class="flex items-center gap-3">
                 <input type="checkbox" ${item.status === 'Completed' ? 'checked' : ''} onchange="chkToggleStatus(${item.id}, this.checked)" class="rounded text-primary focus:ring-primary border-[#e0e8e8] dark:border-white/10 dark:bg-white/5 h-5 w-5">
                 <div>
-                    <p class="font-bold text-sm ${item.status === 'Completed' ? 'line-through text-[#5e8d8d]' : ''}">${item.title}</p>
+                    <p class="font-bold text-sm ${item.status === 'Completed' ? 'line-through text-[#5e8d8d]' : ''}">${escapeHtml(item.title)}</p>
                     <div class="flex gap-2 items-center mt-1">
-                        <span class="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary dark:bg-accent-gold/10 dark:text-accent-gold uppercase font-bold">${item.category}</span>
-                        ${item.due_date ? `<span class="text-[10px] text-[#5e8d8d] flex items-center gap-1 font-medium"><span class="material-symbols-outlined text-[12px]">calendar_month</span> Due: ${item.due_date}</span>` : ''}
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary dark:bg-accent-gold/10 dark:text-accent-gold uppercase font-bold">${escapeHtml(item.category)}</span>
+                        ${item.due_date ? `<span class="text-[10px] text-[#5e8d8d] flex items-center gap-1 font-medium"><span class="material-symbols-outlined text-[12px]">calendar_month</span> Due: ${escapeHtml(item.due_date)}</span>` : ''}
                     </div>
                 </div>
             </div>
@@ -693,11 +703,11 @@ async function loadBookings() {
                         <span class="material-symbols-outlined">receipt_long</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-base leading-tight">${b.vendor_name}</h3>
-                        <p class="text-[10px] font-bold text-accent-gold uppercase tracking-wider mt-0.5">${b.package_name}</p>
+                        <h3 class="font-bold text-base leading-tight">${escapeHtml(b.vendor_name)}</h3>
+                        <p class="text-[10px] font-bold text-accent-gold uppercase tracking-wider mt-0.5">${escapeHtml(b.package_name)}</p>
                     </div>
                 </div>
-                <span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold flex-shrink-0">${b.status}</span>
+                <span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold flex-shrink-0">${escapeHtml(b.status)}</span>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4 text-sm flex-1">
                 <div>
@@ -706,7 +716,7 @@ async function loadBookings() {
                 </div>
                 <div>
                     <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Event Date</p>
-                    <p class="font-medium text-xs">${b.date}</p>
+                    <p class="font-medium text-xs">${escapeHtml(b.date)}</p>
                 </div>
                 <div>
                     <p class="text-[#5e8d8d] text-[10px] uppercase font-bold tracking-wider mb-0.5">Total Amount</p>
@@ -719,15 +729,21 @@ async function loadBookings() {
             </div>
             <div class="bg-[#f0f5f5] dark:bg-white/5 p-3 rounded-lg mb-5 border border-[#dae7e7] dark:border-white/5">
                 <p class="text-[10px] font-bold mb-1 flex items-center gap-1 text-[#101818] dark:text-white uppercase"><span class="material-symbols-outlined text-[14px] text-primary">info</span> Location</p>
-                <p class="text-xs text-[#5e8d8d] leading-relaxed">${b.location || 'Not specified'}</p>
+                <p class="text-xs text-[#5e8d8d] leading-relaxed">${escapeHtml(b.location) || 'Not specified'}</p>
             </div>
             <div class="flex gap-2 mt-auto">
                 <button onclick="showToast('Downloading Invoice...')" class="flex-1 bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
                     <span class="material-symbols-outlined text-[16px]">download</span> Invoice
                 </button>
-                <button onclick="showToast('Contacting Vendor...')" class="flex-1 bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-1">
-                    <span class="material-symbols-outlined text-[16px]">call</span> Contact
+                ${b.paid_amount < b.amount ? `
+                <button onclick="payForBooking(${b.id})" class="flex-1 bg-accent-gold text-white py-2 rounded-xl text-xs font-bold hover:bg-accent-gold/90 transition-colors flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">payments</span> Pay Now
                 </button>
+                ` : `
+                <button disabled class="flex-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-default">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span> Fully Paid
+                </button>
+                `}
             </div>
         </div>
         `).join('');
@@ -738,6 +754,64 @@ async function loadBookings() {
                 ⚠️ Failed to load bookings from database.
             </div>
         `;
+    }
+}
+
+async function payForBooking(bookingId) {
+    if (typeof Razorpay === 'undefined') {
+        showToast('Payment system failed to load. Please check your connection and refresh.');
+        return;
+    }
+    try {
+        const orderData = await apiFetch('/api/payments/create-order', {
+            method: 'POST',
+            body: JSON.stringify({ booking_id: bookingId })
+        });
+
+        const custStr = sessionStorage.getItem('eazeevent_logged_in_customer');
+        const cust = custStr ? JSON.parse(custStr) : {};
+
+        const options = {
+            "key": orderData.key_id,
+            "amount": orderData.amount * 100,
+            "currency": orderData.currency,
+            "name": "Eazeevent",
+            "description": "Booking Payment",
+            "order_id": orderData.order_id,
+            "handler": async function (response) {
+                try {
+                    await apiFetch('/api/payments/verify-signature', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            booking_id: bookingId,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    });
+                    showToast('Payment successful! Your booking is confirmed. 🎉');
+                    await loadBookings();
+                } catch (err) {
+                    showToast('Payment verification failed: ' + err.message);
+                }
+            },
+            "prefill": {
+                "name": cust.name || "",
+                "email": cust.email || ""
+            },
+            "theme": {
+                "color": "#004c4c"
+            }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+            showToast("Payment failed: " + response.error.description);
+        });
+        rzp.open();
+
+    } catch (err) {
+        showToast('Could not start payment: ' + err.message);
     }
 }
 
@@ -806,12 +880,12 @@ function renderGuests(data) {
 
     const rows = data.map((g, i) => `
         <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-            <td class="px-4 py-3 font-medium">${g.name}</td>
-            <td class="px-4 py-3 text-[#5e8d8d] text-sm">${g.contact}</td>
+            <td class="px-4 py-3 font-medium">${escapeHtml(g.name)}</td>
+            <td class="px-4 py-3 text-[#5e8d8d] text-sm">${escapeHtml(g.contact)}</td>
             <td class="px-4 py-3 text-center">
-                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${g.rsvp === 'Confirmed' ? 'bg-green-100 text-green-700' : g.rsvp === 'Pending' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}">${g.rsvp}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${g.rsvp === 'Confirmed' ? 'bg-green-100 text-green-700' : g.rsvp === 'Pending' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}">${escapeHtml(g.rsvp)}</span>
             </td>
-            <td class="px-4 py-3 text-center text-xs">${g.side}</td>
+            <td class="px-4 py-3 text-center text-xs">${escapeHtml(g.side)}</td>
             <td class="px-4 py-3 text-right">
                 <div class="flex justify-end gap-1 relative">
                     <button onclick="toggleActionMenu(${i}, event)" class="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors flex items-center" title="Change RSVP Status">
@@ -838,9 +912,9 @@ function renderGuests(data) {
     if(dashPreview) {
         dashPreview.innerHTML = data.slice(0, 3).map(g => `
         <tr>
-            <td class="py-3 font-medium">${g.name}</td>
-            <td class="py-3 text-center"><span class="bg-${g.rsvp === 'Confirmed' ? 'green' : g.rsvp === 'Pending' ? 'orange' : 'red'}-100 text-${g.rsvp === 'Confirmed' ? 'green' : g.rsvp === 'Pending' ? 'orange' : 'red'}-700 text-[10px] px-2 py-0.5 rounded-full font-bold">${g.rsvp}</span></td>
-            <td class="py-3 text-right text-xs">${g.side}</td>
+            <td class="py-3 font-medium">${escapeHtml(g.name)}</td>
+            <td class="py-3 text-center"><span class="bg-${g.rsvp === 'Confirmed' ? 'green' : g.rsvp === 'Pending' ? 'orange' : 'red'}-100 text-${g.rsvp === 'Confirmed' ? 'green' : g.rsvp === 'Pending' ? 'orange' : 'red'}-700 text-[10px] px-2 py-0.5 rounded-full font-bold">${escapeHtml(g.rsvp)}</span></td>
+            <td class="py-3 text-right text-xs">${escapeHtml(g.side)}</td>
         </tr>`).join('');
     }
     

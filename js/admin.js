@@ -1,3 +1,13 @@
+function escapeHtml(unsafe) {
+    if (unsafe === undefined || unsafe === null) return "";
+    return String(unsafe)
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 // ============ ROLE-BASED ACCESS CONTROL & API CLIENT ============
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -458,10 +468,10 @@ function renderCustomerTable(searchQuery = '') {
         <tr class="hover:bg-surface-container-lowest transition-colors ${c.status === 'AT RISK' ? 'bg-error-container/5 hover:bg-error-container/10' : ''}">
             <td class="py-4 px-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full ${avatarBg} flex items-center justify-center text-xs font-bold">${initials}</div>
+                    <div class="w-8 h-8 rounded-full ${avatarBg} flex items-center justify-center text-xs font-bold">${escapeHtml(initials)}</div>
                     <div>
-                        <p class="font-semibold text-primary">${c.name}</p>
-                        <p class="text-xs text-on-surface-variant">Last active: ${c.lastActive || 'N/A'}</p>
+                        <p class="font-semibold text-primary">${escapeHtml(c.name)}</p>
+                        <p class="text-xs text-on-surface-variant">Last active: ${escapeHtml(c.lastActive) || 'N/A'}</p>
                     </div>
                     ${c.status === 'AT RISK' ? `<span class="ml-2 bg-error-red/10 text-error-red px-2 py-0.5 rounded text-[10px] font-bold">AT RISK</span>` : ''}
                 </div>
@@ -471,7 +481,7 @@ function renderCustomerTable(searchQuery = '') {
                     <span class="material-symbols-outlined text-[16px]">calendar_month</span>
                     ${formatDate(c.weddingDate)}
                 </div>
-                ${c.status === 'AT RISK' ? `<p class="text-xs text-error mt-0.5">${c.riskDescription || 'At Risk'}</p>` : ''}
+                ${c.status === 'AT RISK' ? `<p class="text-xs text-error mt-0.5">${escapeHtml(c.riskDescription) || 'At Risk'}</p>` : ''}
             </td>
             <td class="py-4 px-4 w-48">
                 <div class="flex justify-between text-xs mb-1">
@@ -487,7 +497,7 @@ function renderCustomerTable(searchQuery = '') {
                 <span class="font-semibold text-primary">${c.vendorsCount || 0}</span><span class="text-on-surface-variant">/${c.totalVendors || 10}</span>
             </td>
             <td class="py-4 px-4 text-right">
-                <button class="text-sm font-semibold text-primary hover:text-accent-gold transition-colors flex items-center justify-end gap-1 w-full" onclick="viewCustomerDetails('${c.email}')">
+                <button class="text-sm font-semibold text-primary hover:text-accent-gold transition-colors flex items-center justify-end gap-1 w-full" onclick="viewCustomerDetails('${escapeHtml(c.email)}')">
                     View
                     <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </button>
@@ -504,7 +514,7 @@ function populateImpersonationDropdown() {
     const customers = db.getCustomers();
     selectEl.innerHTML = `
         <option value="">Select client to view...</option>
-        ${customers.map(c => `<option value="${c.email}">${c.name} (${getInitials(c.name)})</option>`).join('')}
+        ${customers.map(c => `<option value="${escapeHtml(c.email)}">${escapeHtml(c.name)} (${getInitials(c.name)})</option>`).join('')}
     `;
 }
 
@@ -701,19 +711,19 @@ function renderSupportInquiries() {
         <div class="p-3 hover:bg-surface-container-lowest rounded-xl transition-colors cursor-pointer border border-transparent hover:border-surface-border mb-1" onclick="viewTicketDetails('${t.id}')">
             <div class="flex justify-between items-start mb-1">
                 <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-full ${avatarBg} flex items-center justify-center text-[10px] font-bold">${initials}</div>
-                    <span class="text-sm font-semibold text-primary">${t.client}</span>
+                    <div class="w-6 h-6 rounded-full ${avatarBg} flex items-center justify-center text-[10px] font-bold">${escapeHtml(initials)}</div>
+                    <span class="text-sm font-semibold text-primary">${escapeHtml(t.client)}</span>
                 </div>
-                <span class="text-[10px] text-on-surface-variant">${t.date}</span>
+                <span class="text-[10px] text-on-surface-variant">${escapeHtml(t.date)}</span>
             </div>
-            <p class="text-xs text-primary font-medium mb-1 truncate">${t.subject}</p>
-            <p class="text-[11px] text-on-surface-variant line-clamp-2">${t.message}</p>
+            <p class="text-xs text-primary font-medium mb-1 truncate">${escapeHtml(t.subject)}</p>
+            <p class="text-[11px] text-on-surface-variant line-clamp-2">${escapeHtml(t.message)}</p>
             <div class="mt-2 flex justify-between items-center">
                 <div class="flex gap-2">
-                    <span class="bg-surface-container-high text-on-surface-variant text-[9px] font-bold px-2 py-0.5 rounded uppercase">${t.category}</span>
+                    <span class="bg-surface-container-high text-on-surface-variant text-[9px] font-bold px-2 py-0.5 rounded uppercase">${escapeHtml(t.category)}</span>
                     ${t.priority === 'High Priority' ? `<span class="bg-error-red/10 text-error-red text-[9px] font-bold px-2 py-0.5 rounded uppercase">High</span>` : ''}
                 </div>
-                <span class="text-[10px] font-bold ${isResolved ? 'text-success-green bg-success-green/10' : 'text-warning-orange bg-warning-orange/10'} px-2 py-0.5 rounded">${t.status}</span>
+                <span class="text-[10px] font-bold ${isResolved ? 'text-success-green bg-success-green/10' : 'text-warning-orange bg-warning-orange/10'} px-2 py-0.5 rounded">${escapeHtml(t.status)}</span>
             </div>
         </div>
         <hr class="border-surface-border/50 mx-3 my-1"/>
@@ -899,21 +909,20 @@ function renderVerificationQueue() {
             <div class="absolute top-0 left-0 w-1 h-full ${statusColor}"></div>
             <div class="flex justify-between items-start">
                 <div>
-                    <h3 class="font-body-lg text-body-lg font-bold text-on-surface">${v.name}</h3>
-                    <p class="font-body-sm text-body-sm text-on-surface-variant">${v.category} • ${v.city}</p>
+                    <h3 class="font-body-lg text-body-lg font-bold text-on-surface">${escapeHtml(v.name)}</h3>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">${escapeHtml(v.category)} • ${escapeHtml(v.city)}</p>
                 </div>
-                <span class="${badgeColor} font-label-bold text-label-bold px-2 py-1 rounded uppercase tracking-wider text-[10px]">${v.status}</span>
+                <span class="${badgeColor} font-label-bold text-label-bold px-2 py-1 rounded uppercase tracking-wider text-[10px]">${escapeHtml(v.status)}</span>
             </div>
             <div class="flex gap-2 text-on-surface-variant font-body-sm text-body-sm">
                 <span class="material-symbols-outlined text-[16px]">attach_file</span>
                 <span>Verification Documents Ready</span>
             </div>
             <div class="flex gap-2 mt-auto pt-2">
-                <button class="bg-primary text-on-primary font-body-md text-body-md py-2 rounded-lg flex-1 shadow-sm hover:opacity-90 transition-opacity" onclick="verifyVendorDirect('${v.id}')">Verify Account</button>
-                <button class="border border-surface-border text-on-surface font-body-md text-body-md py-2 px-3 rounded-lg hover:bg-surface-container-low transition-colors" onclick="reviewVendorPortfolio('${v.id}')" title="Review Profile">Review</button>
+                <button class="bg-primary text-on-primary font-body-md text-body-md py-2 rounded-lg flex-1 shadow-sm hover:opacity-90 transition-opacity" onclick="verifyVendorDirect('${escapeHtml(v.id)}')">Verify Account</button>
+                <button class="border border-surface-border text-on-surface font-body-md text-body-md py-2 px-3 rounded-lg hover:bg-surface-container-low transition-colors" onclick="reviewVendorPortfolio('${escapeHtml(v.id)}')" title="Review Profile">Review</button>
             </div>
         </div>
-        `;
     }).join('');
 }
 
@@ -1021,7 +1030,7 @@ function renderVendorTable() {
         } else {
             statusBadge = `
             <span class="inline-flex items-center gap-1 bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold px-2 py-1 rounded-full uppercase tracking-wider text-[10px]">
-                ${v.status}
+                ${escapeHtml(v.status)}
             </span>
             `;
         }
@@ -1030,15 +1039,15 @@ function renderVendorTable() {
         <tr class="hover:bg-surface transition-colors group">
             <td class="py-4 px-6">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full ${avatarBg} flex items-center justify-center font-bold text-sm">${initials}</div>
+                    <div class="w-10 h-10 rounded-full ${avatarBg} flex items-center justify-center font-bold text-sm">${escapeHtml(initials)}</div>
                     <div>
-                        <div class="font-body-md text-body-md font-bold text-on-surface">${v.name}</div>
-                        <div class="font-body-sm text-body-sm text-on-surface-variant">ID: ${v.id}</div>
+                        <div class="font-body-md text-body-md font-bold text-on-surface">${escapeHtml(v.name)}</div>
+                        <div class="font-body-sm text-body-sm text-on-surface-variant">ID: ${escapeHtml(v.id)}</div>
                     </div>
                 </div>
             </td>
-            <td class="py-4 px-6 font-body-sm text-body-sm text-on-surface">${v.category}</td>
-            <td class="py-4 px-6 font-body-sm text-body-sm text-on-surface">${v.city}</td>
+            <td class="py-4 px-6 font-body-sm text-body-sm text-on-surface">${escapeHtml(v.category)}</td>
+            <td class="py-4 px-6 font-body-sm text-body-sm text-on-surface">${escapeHtml(v.city)}</td>
             <td class="py-4 px-6 font-body-sm text-body-sm text-on-surface">${v.bookings || 0}</td>
             <td class="py-4 px-6">
                 <div class="flex items-center gap-1">
@@ -1050,11 +1059,11 @@ function renderVendorTable() {
             <td class="py-4 px-6 text-right">
                 <div class="flex justify-end gap-2 md:opacity-0 group-hover:opacity-100 transition-opacity">
                     ${v.status !== 'Verified' && v.status !== 'Suspended' ? `
-                        <button class="p-1.5 bg-primary text-on-primary hover:bg-primary-container rounded shadow-sm transition-colors" onclick="verifyVendorDirect('${v.id}')" title="Verify Account"><span class="material-symbols-outlined text-[20px]">task_alt</span></button>
+                        <button class="p-1.5 bg-primary text-on-primary hover:bg-primary-container rounded shadow-sm transition-colors" onclick="verifyVendorDirect('${escapeHtml(v.id)}')" title="Verify Account"><span class="material-symbols-outlined text-[20px]">task_alt</span></button>
                     ` : ''}
-                    <button class="p-1.5 text-primary hover:bg-surface-container-high rounded border border-surface-border transition-colors" onclick="reviewVendorPortfolio('${v.id}')" title="Review Portfolio"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+                    <button class="p-1.5 text-primary hover:bg-surface-container-high rounded border border-surface-border transition-colors" onclick="reviewVendorPortfolio('${escapeHtml(v.id)}')" title="Review Portfolio"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
                     ${v.status === 'Verified' ? `
-                        <button class="p-1.5 text-error-red hover:bg-error-container rounded border border-error-container transition-colors" onclick="suspendVendor('${v.id}')" title="Suspend"><span class="material-symbols-outlined text-[20px]">block</span></button>
+                        <button class="p-1.5 text-error-red hover:bg-error-container rounded border border-error-container transition-colors" onclick="suspendVendor('${escapeHtml(v.id)}')" title="Suspend"><span class="material-symbols-outlined text-[20px]">block</span></button>
                     ` : ''}
                 </div>
             </td>
@@ -1344,12 +1353,12 @@ function renderTransactionTable() {
         
         return `
             <tr class="hover:bg-surface-container-lowest transition-colors">
-                <td class="py-4 px-6 font-semibold text-primary text-xs">${t.id}</td>
-                <td class="py-4 px-6 font-medium">${t.client}</td>
-                <td class="py-4 px-6 font-medium">${t.vendor}</td>
-                <td class="py-4 px-6">${t.type}</td>
+                <td class="py-4 px-6 font-semibold text-primary text-xs">${escapeHtml(t.id)}</td>
+                <td class="py-4 px-6 font-medium">${escapeHtml(t.client)}</td>
+                <td class="py-4 px-6 font-medium">${escapeHtml(t.vendor)}</td>
+                <td class="py-4 px-6">${escapeHtml(t.type)}</td>
                 <td class="py-4 px-6 font-bold text-primary">${formatMoney(t.amount)}</td>
-                <td class="py-4 px-6 text-on-surface-variant text-xs">${t.date}</td>
+                <td class="py-4 px-6 text-on-surface-variant text-xs">${escapeHtml(t.date)}</td>
                 <td class="py-4 px-6">${statusBadge}</td>
                 <td class="py-4 px-6 text-right">${actionButtons}</td>
             </tr>

@@ -1,4 +1,14 @@
 
+function escapeHtml(unsafe) {
+    if (unsafe === undefined || unsafe === null) return "";
+    return String(unsafe)
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 // Seed Settings if missing
 if (!localStorage.getItem('eazeevent_admin_settings')) {
     const defaultSettings = {
@@ -272,7 +282,7 @@ function updateBudgetUI() {
     if(list) {
         list.innerHTML = expenses.map(exp => `
             <tr class="border-b border-gray-100 dark:border-white/5">
-                <td class="py-2">${exp.name}</td>
+                <td class="py-2">${escapeHtml(exp.name)}</td>
                 <td class="py-2 font-bold">₹${exp.amount.toLocaleString()}</td>
             </tr>
         `).join('');
@@ -305,13 +315,13 @@ function updateTimelineUI() {
         if (timelineEvents[day].length === 0) return '';
         return `
             <div>
-                <h4 class="font-bold text-accent-gold mb-2">${day}</h4>
+                <h4 class="font-bold text-accent-gold mb-2">${escapeHtml(day)}</h4>
                 <div class="border-l-2 border-primary/20 ml-2 space-y-4">
                     ${timelineEvents[day].map(ev => `
                         <div class="relative pl-6">
                             <div class="absolute w-3 h-3 bg-primary rounded-full -left-[7px] top-1.5"></div>
-                            <span class="text-xs font-bold text-primary dark:text-white/60">${ev.time}</span>
-                            <p class="text-sm">${ev.desc}</p>
+                            <span class="text-xs font-bold text-primary dark:text-white/60">${escapeHtml(ev.time)}</span>
+                            <p class="text-sm">${escapeHtml(ev.desc)}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -434,6 +444,9 @@ async function handleCustomerSignup(event) {
     const fullname = form.fullname.value;
     const phone = form.countrycode.value + " " + form.phone.value;
 
+    const weddingDateValue = form.weddingdate.value;
+    const estimatedBudgetValue = parseFloat(form.estimatedbudget.value) || 0.0;
+
     if (pwd !== cpwd) { alert('❌ Passwords do not match!'); return; }
     if (!form.proofid.files.length) { alert('❌ Please upload valid proof ID!'); return; }
 
@@ -454,8 +467,8 @@ async function handleCustomerSignup(event) {
                 password: pwd,
                 name: fullname,
                 phone: phone,
-                wedding_date: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                estimated_budget: 5000000.0,
+                wedding_date: weddingDateValue,
+                estimated_budget: estimatedBudgetValue,
                 proof_file: proofUrl
             })
         });

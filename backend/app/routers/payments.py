@@ -12,7 +12,6 @@ router = APIRouter(prefix="/api/payments", tags=["payments"])
 
 class CreateOrderRequest(BaseModel):
     booking_id: int
-    amount: float
 
 class VerifyPaymentRequest(BaseModel):
     booking_id: int
@@ -21,12 +20,28 @@ class VerifyPaymentRequest(BaseModel):
     razorpay_signature: str
 
 @router.post("/create-order")
-def create_payment_order(payload: CreateOrderRequest, current_user: User = Depends(get_current_user)):
+def create_payment_order(
+    payload: CreateOrderRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    booking = db.query(Booking).filter(Booking.id == payload.booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found.")
+    if booking.customer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="This booking does not belong to you.")
+    if booking.paid_amount >= booking.amount:
+        raise HTTPException(status_code=400, detail="This booking is already fully paid.")
+
+    # Amount is derived from the booking record itself, never from the client,
+    # so a tampered request can't create a lower-value order for a real booking.
+    amount_due = booking.amount - booking.paid_amount
+
     try:
         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
         
         # Razorpay amount is in paise (1 INR = 100 paise)
-        amount_paise = int(payload.amount * 100)
+        amount_paise = int(amount_due * 100)
         
         order_data = {
             "amount": amount_paise,
@@ -38,7 +53,7 @@ def create_payment_order(payload: CreateOrderRequest, current_user: User = Depen
         order = client.order.create(data=order_data)
         return {
             "order_id": order["id"],
-            "amount": payload.amount,
+            "amount": amount_due,
             "currency": "INR",
             "key_id": settings.RAZORPAY_KEY_ID
         }
@@ -70,9 +85,24 @@ def verify_payment_signature(
         booking = db.query(Booking).filter(Booking.id == payload.booking_id).first()
         if not booking:
             raise HTTPException(status_code=404, detail="Booking not found.")
-            
-        # Update paid amount
-        booking.paid_amount = booking.amount
+        if booking.customer_id != current_user.id:
+            raise HTTPException(status_code=403, detail="This booking does not belong to you.")
+
+        # Cross-check what was ACTUALLY paid via Razorpay against what was actually
+        # due on this booking at the time. Without this, a client could tamper with
+        # the amount somewhere in the flow and this endpoint would still mark the
+        # booking as paid based on trust alone.
+        amount_due = booking.amount - booking.paid_amount
+        paid_payment = client.payment.fetch(payload.razorpay_payment_id)
+        actually_paid_rupees = paid_payment["amount"] / 100.0
+        if abs(actually_paid_rupees - amount_due) > 1.0:  # allow for paise rounding
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Amount paid does not match the amount due on this booking. Payment not confirmed."
+            )
+
+        # Update paid amount (incremental, capped at the full booking amount)
+        booking.paid_amount = min(booking.amount, booking.paid_amount + actually_paid_rupees)
         booking.status = "Confirmed"
         
         # Record escrow deposit transaction
@@ -82,7 +112,7 @@ def verify_payment_signature(
         new_txn = Transaction(
             booking_id=booking.id,
             vendor_id=booking.vendor_id,
-            amount=booking.amount,
+            amount=actually_paid_rupees,
             type="deposit",
             status="Pending", # Held in escrow until released by admin
             date=datetime.date.today().strftime("%b %d, %Y"),

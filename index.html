@@ -730,6 +730,14 @@
                     <label class="block font-semibold mb-2 text-sm">Confirm Password *</label>
                     <input type="password" name="confirmpassword" required minlength="8" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-white/20 dark:bg-primary/10 focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white outline-none" placeholder="Confirm password">
                 </div>
+                <div class="mb-4">
+                    <label class="block font-semibold mb-2 text-sm">Wedding Date *</label>
+                    <input type="date" name="weddingdate" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-white/20 dark:bg-primary/10 focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white outline-none">
+                </div>
+                <div class="mb-4">
+                    <label class="block font-semibold mb-2 text-sm">Estimated Budget (in INR) *</label>
+                    <input type="number" name="estimatedbudget" required min="1000" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-white/20 dark:bg-primary/10 focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white outline-none" placeholder="e.g. 500000">
+                </div>
                 <div class="mb-6">
                     <label class="block font-semibold mb-2 text-sm">Upload Valid Proof ID *</label>
                     <div class="border-2 border-dashed border-gray-300 dark:border-white/20 rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer" onclick="document.getElementById('proofFile').click()">

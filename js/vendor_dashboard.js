@@ -1,3 +1,13 @@
+function escapeHtml(unsafe) {
+    if (unsafe === undefined || unsafe === null) return "";
+    return String(unsafe)
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 // ============ ROLE-BASED ACCESS CONTROL & API CLIENT ============
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -179,11 +189,11 @@ function renderDashboardInquiries() {
     el.innerHTML = inquiries.slice(0, 3).map(inq => `
     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border-b last:border-0 border-[#e0e8e8] dark:border-[#2a4a4a] items-center hover:bg-gray-50 dark:hover:bg-[#2a4a4a]/30 transition-colors">
         <div class="col-span-4 flex items-center gap-3">
-            <div class="size-10 rounded-full avatar-placeholder flex items-center justify-center text-sm">${inq.initials}</div>
-            <div><p class="font-bold text-sm">${inq.name}</p><p class="text-xs text-[#5e8d8d]">${inq.pkg}</p></div>
+            <div class="size-10 rounded-full avatar-placeholder flex items-center justify-center text-sm">${escapeHtml(inq.initials)}</div>
+            <div><p class="font-bold text-sm">${escapeHtml(inq.name)}</p><p class="text-xs text-[#5e8d8d]">${escapeHtml(inq.pkg)}</p></div>
         </div>
-        <div class="col-span-3"><p class="text-sm font-medium">${inq.date}</p><p class="text-xs text-[#5e8d8d]">${inq.location}</p></div>
-        <div class="col-span-3"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md ${statusColors[inq.status]} text-xs font-bold shadow-sm"><span class="size-1.5 rounded-full ${statusDots[inq.status]}"></span>${inq.status}</span></div>
+        <div class="col-span-3"><p class="text-sm font-medium">${escapeHtml(inq.date)}</p><p class="text-xs text-[#5e8d8d]">${escapeHtml(inq.location)}</p></div>
+        <div class="col-span-3"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md ${statusColors[inq.status]} text-xs font-bold shadow-sm"><span class="size-1.5 rounded-full ${statusDots[inq.status]}"></span>${escapeHtml(inq.status)}</span></div>
         <div class="col-span-2 md:text-right mt-2 md:mt-0">
             ${inq.status === 'New Request' ? `<div class="flex gap-2 justify-end"><button class="flex-1 md:flex-none px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition ripple" onclick="openChat(${inq.id})">Respond</button><button class="flex-1 md:flex-none px-3 py-1.5 border border-red-200 text-red-500 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-900/20 text-xs font-bold rounded-lg transition ripple" onclick="openRemoveModal(${inq.id})">Remove</button></div>` :
             inq.status === 'In Discussion' ? `<div class="flex gap-2 justify-end"><button class="p-2 text-[#5e8d8d] hover:text-primary bg-gray-100 dark:bg-[#102a2a] rounded-lg transition" onclick="openChat(${inq.id})"><span class="material-symbols-outlined text-sm">chat</span></button><button class="p-2 text-green-600 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 transition" onclick="confirmBooking(${inq.id})"><span class="material-symbols-outlined text-sm">check</span></button></div>` :
@@ -199,12 +209,12 @@ function renderInquiries() {
     el.innerHTML = filtered.map(inq => `
     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border-b last:border-0 border-[#e0e8e8] dark:border-[#2a4a4a] items-center hover:bg-gray-50 dark:hover:bg-[#2a4a4a]/30 transition-colors">
         <div class="col-span-4 flex items-center gap-3">
-            <div class="size-10 rounded-full avatar-placeholder flex items-center justify-center text-sm">${inq.initials}</div>
-            <div><p class="font-bold text-sm">${inq.name}</p><p class="text-xs text-[#5e8d8d]">${inq.pkg}</p><p class="text-xs font-bold text-primary dark:text-accent-gold mt-0.5">${inq.budget}</p></div>
+            <div class="size-10 rounded-full avatar-placeholder flex items-center justify-center text-sm">${escapeHtml(inq.initials)}</div>
+            <div><p class="font-bold text-sm">${escapeHtml(inq.name)}</p><p class="text-xs text-[#5e8d8d]">${escapeHtml(inq.pkg)}</p><p class="text-xs font-bold text-primary dark:text-accent-gold mt-0.5">${escapeHtml(inq.budget)}</p></div>
         </div>
-        <div class="col-span-2"><p class="text-sm font-medium">${inq.date}</p></div>
-        <div class="col-span-2"><p class="text-sm text-[#5e8d8d] font-semibold">${inq.location}</p></div>
-        <div class="col-span-2"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md ${statusColors[inq.status]} text-xs font-bold"><span class="size-1.5 rounded-full ${statusDots[inq.status]}"></span>${inq.status}</span></div>
+        <div class="col-span-2"><p class="text-sm font-medium">${escapeHtml(inq.date)}</p></div>
+        <div class="col-span-2"><p class="text-sm text-[#5e8d8d] font-semibold">${escapeHtml(inq.location)}</p></div>
+        <div class="col-span-2"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md ${statusColors[inq.status]} text-xs font-bold"><span class="size-1.5 rounded-full ${statusDots[inq.status]}"></span>${escapeHtml(inq.status)}</span></div>
         <div class="col-span-2 flex gap-2 justify-end flex-wrap">
             ${inq.status === 'New Request' ? `
                 <button class="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition ripple" onclick="openChat(${inq.id})">Respond</button>
@@ -222,18 +232,18 @@ function renderBookings() {
     const el = document.getElementById('bookingsList');
     el.innerHTML = bookings.map(b => `
     <div class="bg-white dark:bg-[#1d3a3a] rounded-2xl border border-[#e0e8e8] dark:border-[#2a4a4a] shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:border-primary/30 dark:hover:border-accent-gold/30 hover:shadow-md transition-all">
-        <div class="size-12 rounded-xl avatar-placeholder shrink-0 flex items-center justify-center">${b.initials}</div>
+        <div class="size-12 rounded-xl avatar-placeholder shrink-0 flex items-center justify-center">${escapeHtml(b.initials)}</div>
         <div class="flex-1 min-w-0">
-            <p class="font-bold">${b.name}</p>
-            <p class="text-sm text-[#5e8d8d]">${b.pkg} · ${b.location}</p>
+            <p class="font-bold">${escapeHtml(b.name)}</p>
+            <p class="text-sm text-[#5e8d8d]">${escapeHtml(b.pkg)} · ${escapeHtml(b.location)}</p>
             <div class="flex flex-wrap gap-3 mt-2">
-                <span class="text-xs font-bold text-[#5e8d8d] flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_month</span>${b.date}</span>
-                <span class="text-xs font-bold text-green-600">Paid: ${b.paid}</span>
-                ${b.due !== '₹0' ? `<span class="text-xs font-bold text-red-500">Due: ${b.due}</span>` : `<span class="text-xs font-bold text-green-500">Fully Paid ✓</span>`}
+                <span class="text-xs font-bold text-[#5e8d8d] flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_month</span>${escapeHtml(b.date)}</span>
+                <span class="text-xs font-bold text-green-600">Paid: ${escapeHtml(b.paid)}</span>
+                ${b.due !== '₹0' ? `<span class="text-xs font-bold text-red-500">Due: ${escapeHtml(b.due)}</span>` : `<span class="text-xs font-bold text-green-500">Fully Paid ✓</span>`}
             </div>
         </div>
         <div class="flex flex-col items-end gap-2">
-            <span class="text-lg font-black">${b.amount}</span>
+            <span class="text-lg font-black">${escapeHtml(b.amount)}</span>
             <div class="flex gap-2">
                 <button class="px-3 py-1.5 border border-[#e0e8e8] dark:border-[#2a4a4a] text-xs font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-[#102a2a] transition" onclick="viewBookingDetail(${b.id})">Details</button>
                 <button class="p-1.5 text-[#5e8d8d] bg-gray-100 dark:bg-[#102a2a] rounded-lg hover:text-primary transition" onclick="openChatForBooking(${b.id})"><span class="material-symbols-outlined text-sm">chat</span></button>
@@ -297,9 +307,9 @@ function renderNotifications() {
     el.innerHTML = notifications.slice(0, 3).map(n => `
     <div class="p-4 hover:bg-gray-50 dark:hover:bg-[#2a4a4a]/50 cursor-pointer transition-colors border-b border-[#e0e8e8] dark:border-[#2a4a4a] ${n.read ? 'opacity-60' : ''}" onclick="navigateTo('inquiries')">
         ${!n.read ? '<div class="flex items-start gap-3"><div class="size-2 rounded-full bg-primary dark:bg-accent-gold mt-1.5 shrink-0"></div><div>' : '<div class="pl-5">'}
-        <p class="text-sm font-bold text-primary dark:text-accent-gold">${n.title}</p>
-        <p class="text-xs text-[#5e8d8d] mt-0.5">${n.body}</p>
-        <p class="text-[10px] text-gray-400 mt-1">${n.time}</p>
+        <p class="text-sm font-bold text-primary dark:text-accent-gold">${escapeHtml(n.title)}</p>
+        <p class="text-xs text-[#5e8d8d] mt-0.5">${escapeHtml(n.body)}</p>
+        <p class="text-[10px] text-gray-400 mt-1">${escapeHtml(n.time)}</p>
         ${!n.read ? '</div></div>' : '</div>'}
     </div>`).join('');
 
@@ -313,13 +323,13 @@ function renderReviews() {
     <div class="border border-[#e0e8e8] dark:border-[#2a4a4a] rounded-xl p-4">
         <div class="flex items-start justify-between gap-2">
             <div>
-                <p class="font-bold text-sm">${r.name}</p>
+                <p class="font-bold text-sm">${escapeHtml(r.name)}</p>
                 <div class="flex gap-0.5 mt-1">${Array(r.stars).fill('<span class="material-symbols-outlined text-accent-gold text-[14px]" style="font-variation-settings:\'FILL\' 1">star</span>').join('')}</div>
             </div>
-            <span class="text-xs text-[#5e8d8d]">${r.date}</span>
+            <span class="text-xs text-[#5e8d8d]">${escapeHtml(r.date)}</span>
         </div>
-        <p class="text-sm text-[#5e8d8d] mt-2 leading-relaxed">${r.text}</p>
-        ${r.replied ? `<div class="mt-3 pl-3 border-l-2 border-primary/30 dark:border-accent-gold/30"><p class="text-xs text-[#5e8d8d] font-semibold italic">"${r.reply}"</p></div>` :
+        <p class="text-sm text-[#5e8d8d] mt-2 leading-relaxed">${escapeHtml(r.text)}</p>
+        ${r.replied ? `<div class="mt-3 pl-3 border-l-2 border-primary/30 dark:border-accent-gold/30"><p class="text-xs text-[#5e8d8d] font-semibold italic">"${escapeHtml(r.reply)}"</p></div>` :
             `<button class="mt-2 text-xs font-bold text-primary dark:text-accent-gold flex items-center gap-1 hover:underline" onclick="openReviewModal(${i})"><span class="material-symbols-outlined text-[14px]">reply</span>Reply</button>`}
     </div>`).join('');
 }
@@ -463,8 +473,8 @@ function renderChatMessages(id) {
     el.innerHTML = (chatHistory[id] || []).map(m => `
     <div class="flex ${m.role === 'vendor' ? 'justify-end' : 'justify-start'}">
         <div class="max-w-[80%] ${m.role === 'vendor' ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-[#102a2a] text-[#101818] dark:text-white'} rounded-2xl ${m.role === 'vendor' ? 'rounded-tr-sm' : 'rounded-tl-sm'} px-4 py-2.5">
-            <p class="text-sm font-semibold">${m.text}</p>
-            <p class="text-[10px] opacity-60 mt-1 text-right">${m.time}</p>
+            <p class="text-sm font-semibold">${escapeHtml(m.text)}</p>
+            <p class="text-[10px] opacity-60 mt-1 text-right">${escapeHtml(m.time)}</p>
         </div>
     </div>`).join('');
     el.scrollTop = el.scrollHeight;
@@ -646,19 +656,57 @@ function openBoostModal() { renderBoostPlans(); openModal('boostModal'); }
 
 async function activateBoost() {
     try {
-        await apiFetch('/api/vendors/portal/boost', {
+        const orderData = await apiFetch('/api/vendors/portal/boost/create-order', {
             method: 'POST',
             body: JSON.stringify({ plan_index: selectedBoostPlan })
         });
         
-        closeModal('boostModal');
-        showToast('Boost activated! Your listing is now featured 🚀');
+        const options = {
+            "key": orderData.key_id,
+            "amount": orderData.amount * 100,
+            "currency": orderData.currency,
+            "name": "Eazeevent",
+            "description": "Vendor Listing Boost Fee",
+            "order_id": orderData.order_id,
+            "handler": async function (response) {
+                try {
+                    await apiFetch('/api/vendors/portal/boost/verify-signature', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            plan_index: selectedBoostPlan,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    });
+                    
+                    closeModal('boostModal');
+                    showToast('Boost activated! Your listing is now featured 🚀');
+                    await loadTransactionsAndEarnings();
+                } catch (err) {
+                    showToast('Boost verification failed: ' + err.message);
+                }
+            },
+            "prefill": {
+                "name": "",
+                "email": ""
+            },
+            "theme": {
+                "color": "#004c4c"
+            }
+        };
         
-        await loadTransactionsAndEarnings();
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+            showToast("Payment failed: " + response.error.description);
+        });
+        rzp.open();
+        
     } catch (err) {
         showToast('Boost failed: ' + err.message);
     }
 }
+
 
 function openReviewModal(idx) { openModal('reviewModal'); }
 
@@ -973,7 +1021,7 @@ async function loadTransactionsAndEarnings() {
         const list = await apiFetch('/api/vendors/portal/transactions');
         transactions = list.map(t => ({
             name: t.client_name,
-            pkg: t.type === 'deposit' ? 'Escrow Deposit Received' : 'Funds Payout',
+            pkg: t.type === 'deposit' ? 'Escrow Deposit Received' : (t.type === 'debit' ? 'Platform Spend (Boost)' : 'Funds Payout'),
             date: t.date,
             amount: `${t.type === 'deposit' ? '+' : '-'}${currency}${t.amount.toLocaleString('en-IN')}`,
             type: t.type === 'deposit' ? 'credit' : 'debit'
