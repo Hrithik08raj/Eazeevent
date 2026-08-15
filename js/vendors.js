@@ -9,7 +9,9 @@ function escapeHtml(unsafe) {
 }
 
 // ============ VENDOR DATA ============
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost")
+    ? "http://127.0.0.1:8000"
+    : "https://eazeevent-backend.onrender.com"; // Update this with your live Render backend URL if different
 
 let ALL_VENDORS = [];
 let activeVendorId = null;

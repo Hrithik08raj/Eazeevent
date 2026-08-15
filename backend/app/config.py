@@ -13,7 +13,10 @@ if env_path.exists():
 
 class Settings:
     PROJECT_NAME: str = "Eazeevent API"
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./eazeevent.db")
+    _db_url = os.getenv("DATABASE_URL", "sqlite:///./eazeevent.db")
+    if _db_url.startswith("postgres://"):
+        _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL: str = _db_url
     
     # Enforce SECRET_KEY from environment with no default fallback
     SECRET_KEY: str = os.getenv("SECRET_KEY")
