@@ -43,7 +43,7 @@ Eazeevent is a comprehensive, production-ready Event Management and Booking Plat
 
 ### Frontend
 *   **Styling:** HTML5, TailwindCSS, CSS3 Variables, Google Fonts (Inter, Playfair Display), Google Material Symbols.
-*   **Logic:** Modern Vanilla JavaScript (ES6+), dynamic DOM rendering, Fetch API client, state management via LocalStorage.
+*   **Logic:** Modern Vanilla JavaScript (ES6+), dynamic DOM rendering, Fetch API client. Authenticated session state (JWT token, logged-in user identity) is held in **`sessionStorage`** (cleared automatically on tab/browser close). `localStorage` is used only on the public landing page to cache seeded demo directory data.
 
 ### Backend
 *   **Framework:** FastAPI (Python 3.9+)
@@ -58,10 +58,13 @@ Eazeevent is a comprehensive, production-ready Event Management and Booking Plat
 
 ```text
 Minor_Proj/
+├── .github/
+│   └── workflows/
+│       └── tests.yml         # GitHub Actions CI — runs pytest on every push/PR to main
 ├── backend/                  # FastAPI Backend Application
 │   ├── app/                  # Application core source code
-│   │   ├── routers/          # API Route Modules (auth, admin, customer, vendor, ai, payments, chat)
-│   │   ├── config.py         # App configuration & environments
+│   │   ├── routers/          # API Route Modules (auth, admin, customer, vendor, ai, payments, chat, invoices)
+│   │   ├── config.py         # App configuration & environment variable loading
 │   │   ├── database.py       # SQLAlchemy engine & session maker
 │   │   ├── deps.py           # Endpoint dependency injections (security, db sessions)
 │   │   ├── main.py           # FastAPI application initialization & middleware
@@ -69,13 +72,25 @@ Minor_Proj/
 │   │   ├── notifications.py  # Email and notification dispatcher
 │   │   ├── schemas.py        # Pydantic schemas for data validation
 │   │   └── security.py       # Password hashing & JWT generation
+│   ├── tests/                # Automated pytest test suite (43 tests, isolated SQLite)
+│   │   ├── conftest.py       # Shared fixtures (in-memory DB, test client, user factories)
+│   │   ├── test_auth.py      # Auth & password reset tests
+│   │   ├── test_customer.py  # Customer CRUD tests
+│   │   ├── test_admin.py     # Admin portal tests
+│   │   ├── test_marketplace.py  # Vendor search, inquiries, booking & invoice tests
+│   │   ├── test_payments.py  # Razorpay payment tests (mocked)
+│   │   ├── test_chat_and_boost.py  # Chat & boost payment tests
+│   │   ├── test_timeline_tickets.py  # Timeline & support ticket tests
+│   │   └── test_ai.py        # AI concierge & matchmaker tests
+│   ├── .env.example          # Environment variable template
 │   ├── Dockerfile            # Container definition for backend
-│   ├── requirements.txt      # Python dependencies
+│   ├── requirements.txt      # Python dependencies (incl. pytest, pytest-mock)
 │   ├── seed.py               # Clean DB init & Admin seeder
-│   └── test_api.py           # Comprehensive integration test suite
+│   └── test_api.py           # Legacy manual integration test script
 ├── css/                      # Global frontend stylesheets
 │   └── global.css            # Custom CSS utilities & variables
 ├── js/                       # Core frontend JavaScript files
+│   ├── config.js             # Central API_BASE_URL (localhost vs. production)
 │   ├── index.js              # Landing page and general scripts
 │   ├── dashboard.js          # Customer dashboard controls
 │   ├── vendors.js            # Vendor browsing & inquiries
@@ -178,3 +193,75 @@ To launch the backend along with a production-ready PostgreSQL database containe
 *   **Password Hashing:** Passwords are encrypted before storing using `bcrypt`.
 *   **JSON Web Tokens (JWT):** Secure session handling and role authentication across endpoints.
 *   **Static File Management:** Automatic management and validation of image and identity proof uploads for vendors.
+
+---
+
+## 🚀 Deployment
+
+### Backend — Render Web Service (Docker)
+
+The backend is deployed to **[Render](https://render.com)** as a **Docker web service** using [`backend/Dockerfile`](backend/Dockerfile).
+
+**Render service settings:**
+- **Root Directory:** `backend`
+- **Environment:** Docker
+- **Start Command:** handled by the `CMD` in the Dockerfile (`uvicorn app.main:app ...`)
+
+#### Required Environment Variables
+
+Set the following in the Render dashboard under **Environment → Environment Variables** for the backend web service. Do **not** paste actual secret values here — use the Render dashboard or a secrets manager.
+
+| Variable | Required | Description |
+|---|---|---|
+| `SECRET_KEY` | ✅ **Required** | Long random string used to sign JWT tokens. Generate with `python -c "import secrets; print(secrets.token_hex(32))"`. |
+| `DATABASE_URL` | ✅ **Required** | PostgreSQL connection string. Render provides this automatically when you attach a PostgreSQL add-on. |
+| `ALLOWED_ORIGINS` | ✅ **Required** | Comma-separated list of frontend origins allowed by CORS, e.g. `https://eazeevent.onrender.com` or your custom domain. |
+| `RAZORPAY_KEY_ID` | ✅ **Required** | Razorpay publishable key ID (starts with `rzp_live_` or `rzp_test_`). |
+| `RAZORPAY_KEY_SECRET` | ✅ **Required** | Razorpay secret key. Never expose this on the frontend. |
+| `SMTP_HOST` | Optional | SMTP server hostname for transactional emails (default: `smtp.gmail.com`). |
+| `SMTP_PORT` | Optional | SMTP port (default: `587`). |
+| `SMTP_USER` | Optional | SMTP login username / email address. |
+| `SMTP_PASSWORD` | Optional | SMTP password or app-specific password. |
+| `SMTP_FROM_EMAIL` | Optional | Sender address shown on outgoing emails (default: `noreply@eazeevent.com`). |
+
+> **`DATABASE_URL` normalization:** Render's PostgreSQL add-on historically provides connection strings in the older `postgres://` format. The app automatically rewrites this to `postgresql://` in [`backend/app/config.py`](backend/app/config.py) — no manual edits to the URL are needed.
+
+#### First-run database seeding
+
+After the service is live, open the **Render Shell** (or use the Render CLI) and run:
+
+```bash
+python seed.py
+```
+
+This creates all tables and inserts the default admin account (`admin@eazeevent.com` / `admin123`). **Change the admin password immediately after first login.**
+
+---
+
+### Frontend — Render Static Site
+
+The frontend (all `.html` files and the `js/`, `css/` directories) is deployed as a **Render Static Site**.
+
+**Render static site settings:**
+- **Root Directory:** `.` (repo root)
+- **Build Command:** *(leave blank — no build step needed)*
+- **Publish Directory:** `.` (repo root)
+
+#### Pointing the frontend at the live backend
+
+The API base URL is centralised in [`js/config.js`](js/config.js). It automatically detects `localhost`/`127.0.0.1` for local development and falls back to the production URL otherwise:
+
+```js
+// js/config.js
+const API_BASE_URL = (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost")
+    ? "http://127.0.0.1:8000"
+    : "https://<your-backend-service>.onrender.com";  // ← replace with your actual Render backend URL
+```
+
+Replace the placeholder with your real Render backend URL before deploying.
+
+---
+
+### Continuous Integration — GitHub Actions
+
+Every push and pull request to `main` automatically runs the full pytest suite (43 tests) via [`.github/workflows/tests.yml`](.github/workflows/tests.yml). Tests use an in-memory SQLite database and mocked Razorpay calls — no real credentials are needed in CI.
