@@ -1,0 +1,41 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run Pytest Suite
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        env:
+          # Provide a test secret key so JWT signing works without a real .env file
+          SECRET_KEY: "ci-test-secret-key-eazeevent-12345678901234567890"
+          # Use SQLite for CI (no real DB needed – conftest uses in-memory SQLite)
+          DATABASE_URL: "sqlite:///./ci_test.db"
+          # Disable Razorpay real calls (tests use mocks)
+          RAZORPAY_KEY_ID: "rzp_test_ci"
+          RAZORPAY_KEY_SECRET: "ci_secret"
+        run: python -m pytest tests/ -v --tb=short

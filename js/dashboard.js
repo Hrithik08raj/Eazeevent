@@ -9,10 +9,6 @@ function escapeHtml(unsafe) {
 }
 
 // ============ ROLE-BASED ACCESS CONTROL & API CLIENT ============
-const API_BASE_URL = (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost")
-    ? "http://127.0.0.1:8000"
-    : "https://eazeevent-backend.onrender.com"; // Update this with your live Render backend URL if different
-
 function getAuthHeader() {
     const token = sessionStorage.getItem('eazeevent_token');
     return token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -734,7 +730,7 @@ async function loadBookings() {
                 <p class="text-xs text-[#5e8d8d] leading-relaxed">${escapeHtml(b.location) || 'Not specified'}</p>
             </div>
             <div class="flex gap-2 mt-auto">
-                <button onclick="showToast('Downloading Invoice...')" class="flex-1 bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
+                <button onclick="downloadInvoice(${b.id})" class="flex-1 bg-white dark:bg-white/5 border border-[#dae7e7] dark:border-white/10 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-1">
                     <span class="material-symbols-outlined text-[16px]">download</span> Invoice
                 </button>
                 ${b.paid_amount < b.amount ? `
@@ -814,6 +810,42 @@ async function payForBooking(bookingId) {
 
     } catch (err) {
         showToast('Could not start payment: ' + err.message);
+    }
+}
+
+async function downloadInvoice(bookingId) {
+    try {
+        showToast('Generating official invoice PDF...');
+        const token = sessionStorage.getItem('eazeevent_token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+        const res = await fetch(`${API_BASE_URL}/api/invoices/booking/${bookingId}`, {
+            headers
+        });
+
+        if (!res.ok) {
+            let errorMsg = 'Failed to generate invoice.';
+            try {
+                const errJson = await res.json();
+                errorMsg = errJson.detail || errorMsg;
+            } catch (e) {}
+            throw new Error(errorMsg);
+        }
+
+        const blob = await res.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        a.download = `invoice_booking_${bookingId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        document.body.removeChild(a);
+        showToast('Invoice downloaded successfully! 📄');
+    } catch (err) {
+        console.error('Invoice download error:', err);
+        showToast('Error downloading invoice: ' + err.message);
     }
 }
 

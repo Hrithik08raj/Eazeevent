@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, customers, vendors, admin, ai, chat, payments
+from app.routers import auth, customers, vendors, admin, ai, chat, payments, invoices
 from app.database import engine, Base
 
 from fastapi.staticfiles import StaticFiles
@@ -39,6 +39,7 @@ app.include_router(admin.router)
 app.include_router(ai.router)
 app.include_router(chat.router)
 app.include_router(payments.router)
+app.include_router(invoices.router)
 
 @app.get("/")
 def read_root():

@@ -7,4 +7,9 @@ python-multipart>=0.0.9
 requests>=2.31.0
 razorpay>=1.4.1
 psycopg2-binary>=2.9.0
+reportlab>=4.0.0
+python-dotenv>=1.0.0
 
+# Test dependencies
+pytest>=9.0.0
+pytest-mock>=3.14.0

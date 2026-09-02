@@ -288,6 +288,17 @@ def run_tests():
     assert any(b["package_name"] == "Wedding Coverage" for b in res.json())
     print("[OK] Customer booking automatically generated and verified.")
 
+    # Test PDF Invoice Generation
+    customer_bookings = res.json()
+    created_booking = next((b for b in customer_bookings if b["package_name"] == "Wedding Coverage"), None)
+    if created_booking:
+        booking_id = created_booking["id"]
+        res = session.get(f"{BASE_URL}/api/invoices/booking/{booking_id}", headers=cust_headers)
+        assert res.status_code == 200, f"Invoice PDF download failed: {res.text}"
+        assert res.headers.get("content-type") == "application/pdf"
+        assert res.content[:4] == b"%PDF"
+        print(f"[OK] Customer successfully generated and downloaded Booking PDF Receipt ({len(res.content)} bytes).")
+
     # --------------------------------------------------
     # 6. ADMIN IMPERSONATION & SETTINGS
     # --------------------------------------------------
