@@ -516,11 +516,39 @@ async function handleVendorLogin(event) {
             sessionStorage.setItem('eazeevent_logged_in_vendor', JSON.stringify({ email: data.email, name: data.name }));
             closeVendorLoginModal();
             window.location.href = 'vendor_dashboard.html';
+        } else if (data.role === 'customer') {
+            sessionStorage.setItem('eazeevent_logged_in_customer', JSON.stringify({ email: data.email, name: data.name }));
+            closeVendorLoginModal();
+            window.location.href = 'dashboard.html';
         } else {
             throw new Error("Invalid role.");
         }
     } catch (err) {
         alert(err.message);
+    }
+}
+
+function fillDemoCredentials(type) {
+    if (type === 'customer') {
+        const emailEl = document.getElementById('customerLoginEmail');
+        const passEl = document.getElementById('customerLoginPassword');
+        if (emailEl) emailEl.value = 'rohan@gmail.com';
+        if (passEl) passEl.value = 'Eazeevent@123';
+    } else if (type === 'admin_cust') {
+        const emailEl = document.getElementById('customerLoginEmail');
+        const passEl = document.getElementById('customerLoginPassword');
+        if (emailEl) emailEl.value = 'admin@eazeevent.com';
+        if (passEl) passEl.value = 'admin123';
+    } else if (type === 'vendor') {
+        const emailEl = document.getElementById('vendorLoginEmail');
+        const passEl = document.getElementById('vendorLoginPassword');
+        if (emailEl) emailEl.value = 'symphony@musicians.com';
+        if (passEl) passEl.value = 'Eazeevent@123';
+    } else if (type === 'admin_vend') {
+        const emailEl = document.getElementById('vendorLoginEmail');
+        const passEl = document.getElementById('vendorLoginPassword');
+        if (emailEl) emailEl.value = 'admin@eazeevent.com';
+        if (passEl) passEl.value = 'admin123';
     }
 }
 

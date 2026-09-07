@@ -653,7 +653,22 @@
                 </div>
                 <h2 class="font-bold text-3xl">Welcome Back</h2>
                 <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Login to your Eazeevent account</p>
-                <p class="text-xs text-accent-gold font-semibold mt-2">💡 Demo Admin: admin@eazeevent.com / admin <br> 💡 Demo Customer: rohan@gmail.com / Eazeevent@123</p>
+                <div class="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-left text-xs space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-accent-gold font-bold flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">person</span> Demo Customer
+                        </span>
+                        <button type="button" onclick="fillDemoCredentials('customer')" class="px-2 py-0.5 text-[11px] bg-accent-gold text-white dark:text-black font-bold rounded hover:opacity-90 transition-all cursor-pointer">Quick Fill</button>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 font-mono text-[11px]">rohan@gmail.com / Eazeevent@123</p>
+                    <div class="flex items-center justify-between pt-1.5 border-t border-amber-500/20">
+                        <span class="text-accent-gold font-bold flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">shield_person</span> Demo Admin
+                        </span>
+                        <button type="button" onclick="fillDemoCredentials('admin_cust')" class="px-2 py-0.5 text-[11px] bg-primary text-white font-bold rounded hover:opacity-90 transition-all cursor-pointer">Quick Fill</button>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 font-mono text-[11px]">admin@eazeevent.com / admin123</p>
+                </div>
             </div>
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
@@ -778,7 +793,22 @@
                 </div>
                 <h2 class="font-bold text-3xl">Vendor Login</h2>
                 <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Manage your business on Eazeevent</p>
-                <p class="text-xs text-accent-gold font-semibold mt-2">💡 Demo Admin: admin@eazeevent.com / admin <br> 💡 Demo Vendor: symphony@musicians.com / Eazeevent@123</p>
+                <div class="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-left text-xs space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-accent-gold font-bold flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">store</span> Demo Vendor (Verified)
+                        </span>
+                        <button type="button" onclick="fillDemoCredentials('vendor')" class="px-2 py-0.5 text-[11px] bg-accent-gold text-white dark:text-black font-bold rounded hover:opacity-90 transition-all cursor-pointer">Quick Fill</button>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 font-mono text-[11px]">symphony@musicians.com / Eazeevent@123</p>
+                    <div class="flex items-center justify-between pt-1.5 border-t border-amber-500/20">
+                        <span class="text-accent-gold font-bold flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">shield_person</span> Demo Admin
+                        </span>
+                        <button type="button" onclick="fillDemoCredentials('admin_vend')" class="px-2 py-0.5 text-[11px] bg-primary text-white font-bold rounded hover:opacity-90 transition-all cursor-pointer">Quick Fill</button>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 font-mono text-[11px]">admin@eazeevent.com / admin123</p>
+                </div>
             </div>
             <form onsubmit="handleVendorLogin(event)">
                 <div class="mb-4">
