@@ -506,7 +506,9 @@ def upload_file(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
-    return {"file_url": f"http://127.0.0.1:8000/static/uploads/{new_filename}"}
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    host = request.headers.get("x-forwarded-host", request.headers.get("host", "127.0.0.1:8000"))
+    return {"file_url": f"{proto}://{host}/static/uploads/{new_filename}"}
 
 
 @router.get("/portal/calendar/blocked", response_model=List[BlockedDateOut])
