@@ -125,20 +125,11 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     login_attempts[payload.email].append(now)
 
     user = db.query(User).filter(User.email == payload.email).first()
-    is_valid_pwd = verify_password(payload.password, user.hashed_password) if user else False
-    
-    # Allow 'admin' or 'admin123' for default platform administrator account
-    if user and user.role == "admin" and user.email == "admin@eazeevent.com" and payload.password in ["admin", "admin123"]:
-        is_valid_pwd = True
-
-    if not user or not is_valid_pwd:
+    if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password."
         )
-    
-    # Clear rate limiter attempts upon successful authentication
-    login_attempts.pop(payload.email, None)
         
     # Security Rule: Pending vendors cannot log in until approved
     if user.role == "vendor":

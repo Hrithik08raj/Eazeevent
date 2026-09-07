@@ -153,11 +153,9 @@ Minor_Proj/
    ```bash
    python seed.py
    ```
-   *Note: This creates a default sqlite database `eazeevent.db` and seeds full ready-to-test demo accounts:*
-   *   **Admin:** `admin@eazeevent.com` / `admin123` (or `admin`)
-   *   **Customer:** `rohan@gmail.com` / `Eazeevent@123` (Rohan & Shruti)
-   *   **Vendor (Verified):** `symphony@musicians.com` / `Eazeevent@123` (Symphony Musicians)
-   *   **Vendor (Pending Review):** `grand@horizon.com` / `Eazeevent@123` (The Grand Horizon)
+   *Note: This creates a default sqlite database `eazeevent.db` and seeds a default admin account:*
+   *   **Admin Email:** `admin@eazeevent.com`
+   *   **Admin Password:** `admin123`
 7. Run the FastAPI development server:
    ```bash
    uvicorn app.main:app --reload --port 8000
