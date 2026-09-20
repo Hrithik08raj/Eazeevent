@@ -13,6 +13,12 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eazeevent_user -d eazeevent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   web:
     build:
@@ -27,7 +33,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://eazeevent_user:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in a .env file at the project root — see .env.example}@db:5432/eazeevent
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./backend/static/uploads:/code/static/uploads
 
