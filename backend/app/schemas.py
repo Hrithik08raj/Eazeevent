@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional, List
 
 # --- AUTH SCHEMAS ---
@@ -44,9 +44,9 @@ class ExpenseCreate(ExpenseBase):
     pass
 
 class ExpenseOut(ExpenseBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # --- GUEST SCHEMAS ---
 class GuestBase(BaseModel):
@@ -60,9 +60,9 @@ class GuestCreate(GuestBase):
     pass
 
 class GuestOut(GuestBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # --- CHECKLIST SCHEMAS ---
 class ChecklistItemBase(BaseModel):
@@ -75,9 +75,9 @@ class ChecklistItemCreate(ChecklistItemBase):
     pass
 
 class ChecklistItemOut(ChecklistItemBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # --- INQUIRY SCHEMAS ---
 class InquiryCreate(BaseModel):
@@ -88,6 +88,8 @@ class InquiryCreate(BaseModel):
     budget: float
 
 class InquiryOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     customer_id: int
     customer_name: Optional[str] = None
@@ -98,8 +100,6 @@ class InquiryOut(BaseModel):
     location: str
     status: str
     budget: float
-    class Config:
-        from_attributes = True
 
 class InquiryStatusUpdate(BaseModel):
     status: str
@@ -113,6 +113,8 @@ class ReviewReply(BaseModel):
     reply_text: str
 
 class ReviewOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     reviewer_name: str
     rating: float
@@ -120,8 +122,6 @@ class ReviewOut(BaseModel):
     date: str
     replied: bool
     reply_text: Optional[str] = None
-    class Config:
-        from_attributes = True
 
 # --- BOOKING SCHEMAS ---
 class BookingCreate(BaseModel):
@@ -133,6 +133,8 @@ class BookingCreate(BaseModel):
     location: Optional[str] = None
 
 class BookingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     customer_id: int
     customer_name: Optional[str] = None
@@ -144,11 +146,11 @@ class BookingOut(BaseModel):
     paid_amount: float
     status: str
     location: Optional[str] = None
-    class Config:
-        from_attributes = True
 
 # --- PROFILE SCHEMAS ---
 class CustomerProfileOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     email: str
     name: str
     phone: Optional[str] = None
@@ -157,8 +159,6 @@ class CustomerProfileOut(BaseModel):
     actual_budget: float
     status: str
     risk_description: Optional[str] = None
-    class Config:
-        from_attributes = True
 
 class CustomerProfileUpdate(BaseModel):
     name: str
@@ -167,6 +167,8 @@ class CustomerProfileUpdate(BaseModel):
     estimated_budget: Optional[float] = None
 
 class VendorProfileOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     name: str
     email: str
@@ -181,8 +183,6 @@ class VendorProfileOut(BaseModel):
     starting_price: float
     packages: Optional[str] = None
     is_boosted: Optional[bool] = False
-    class Config:
-        from_attributes = True
 
 class VendorProfileUpdate(BaseModel):
     name: str
@@ -205,14 +205,14 @@ class BoostVerifyRequest(BaseModel):
 
 # --- ADMIN SETTINGS & STATS ---
 class AdminSettingsOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     platform_name: str
     support_email: str
     commission_rate: float
     currency_symbol: str
     maintenance_mode: bool
     gemini_api_key: Optional[str] = None
-    class Config:
-        from_attributes = True
 
 class AdminSettingsUpdate(BaseModel):
     platform_name: str
@@ -240,9 +240,9 @@ class TimelineItemCreate(TimelineItemBase):
     pass
 
 class TimelineItemOut(TimelineItemBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # --- SUPPORT TICKET SCHEMAS ---
 class SupportTicketBase(BaseModel):
@@ -254,6 +254,8 @@ class SupportTicketCreate(SupportTicketBase):
     priority: str
 
 class SupportTicketOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     client_name: str
     client_email: str
@@ -264,8 +266,6 @@ class SupportTicketOut(BaseModel):
     status: str
     date: str
     replies: Optional[str] = None
-    class Config:
-        from_attributes = True
 
 # --- ACTIVITY LOG SCHEMAS ---
 class ActivityLogBase(BaseModel):
@@ -274,12 +274,14 @@ class ActivityLogBase(BaseModel):
     type: str
 
 class ActivityLogOut(ActivityLogBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    class Config:
-        from_attributes = True
 
 # --- TRANSACTION SCHEMAS ---
 class TransactionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     booking_id: int
     vendor_id: int
@@ -289,21 +291,19 @@ class TransactionOut(BaseModel):
     date: str
     client_name: str
     vendor_name: str
-    class Config:
-        from_attributes = True
 
 # --- CHAT MESSAGES SCHEMAS ---
 class ChatMessageCreate(BaseModel):
     text: str
 
 class ChatMessageOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     inquiry_id: int
     sender_role: str
     text: str
     time: str
-    class Config:
-        from_attributes = True
 
 # --- PASSWORD RESET SCHEMAS ---
 class PasswordResetRequest(BaseModel):
@@ -319,8 +319,8 @@ class BlockedDateCreate(BaseModel):
     date: str
 
 class BlockedDateOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     vendor_id: int
     date: str
-    class Config:
-        from_attributes = True
