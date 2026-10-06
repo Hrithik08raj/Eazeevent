@@ -47,3 +47,17 @@ def read_root():
         "status": "online",
         "message": "Welcome to the Eazeevent API. Please visit /docs for API documentation."
     }
+
+@app.get("/api/cleanup-test-accounts")
+def cleanup_test_accounts():
+    """Temporary: Remove smoke test dummy accounts from live DB, keeping only admin."""
+    from app.database import SessionLocal
+    from app.models import User
+    db = SessionLocal()
+    try:
+        deleted = db.query(User).filter(User.role != "admin").delete()
+        db.commit()
+        return {"message": f"Cleaned up successfully. Removed {deleted} non-admin user(s). DB is now clean."}
+    finally:
+        db.close()
+
