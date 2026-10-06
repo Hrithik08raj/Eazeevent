@@ -47,12 +47,3 @@ def read_root():
         "status": "online",
         "message": "Welcome to the Eazeevent API. Please visit /docs for API documentation."
     }
-
-@app.get("/api/seed")
-def trigger_seed():
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
-    from seed import seed_db
-    seed_db()
-    return {"message": "Database seeded successfully!"}
