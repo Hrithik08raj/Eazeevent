@@ -22,6 +22,7 @@ class AdminProfileOut(BaseModel):
 
 class AdminProfileUpdate(BaseModel):
     name: str
+    email: str
     current_password: Optional[str] = None
     new_password: Optional[str] = None
 
@@ -40,6 +41,13 @@ def update_admin_profile(
         raise HTTPException(status_code=404, detail="Admin user not found.")
 
     user.name = payload.name.strip()
+    
+    new_email = payload.email.strip().lower()
+    if new_email != user.email:
+        existing_user = db.query(User).filter(User.email == new_email).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email is already in use by another account.")
+        user.email = new_email
 
     if payload.new_password:
         if not payload.current_password:

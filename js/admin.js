@@ -265,12 +265,16 @@ function openAdminProfileModal() {
             <div class="text-center mb-6">
                 <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3" id="profileModalAvatar">${getInitials(profile.name)}</div>
                 <h3 class="text-xl font-bold text-primary">Edit Admin Profile</h3>
-                <p class="text-sm text-gray-500">${profile.email}</p>
+                <p class="text-sm text-gray-500">Manage your account details</p>
             </div>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold mb-1">Display Name</label>
                     <input id="adminProfileName" type="text" value="${escapeHtml(profile.name)}" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Email Address</label>
+                    <input id="adminProfileEmail" type="email" value="${escapeHtml(profile.email)}" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none text-sm" />
                 </div>
                 <hr class="border-gray-200" />
                 <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Change Password (optional)</p>
@@ -291,11 +295,13 @@ function openAdminProfileModal() {
 
 async function saveAdminProfile() {
     const name = document.getElementById('adminProfileName')?.value?.trim();
+    const email = document.getElementById('adminProfileEmail')?.value?.trim();
     const currentPwd = document.getElementById('adminCurrentPwd')?.value;
     const newPwd = document.getElementById('adminNewPwd')?.value;
     if (!name) { alert('Name cannot be empty.'); return; }
+    if (!email) { alert('Email cannot be empty.'); return; }
     try {
-        const payload = { name };
+        const payload = { name, email };
         if (newPwd) {
             payload.current_password = currentPwd;
             payload.new_password = newPwd;
