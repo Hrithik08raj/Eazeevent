@@ -652,6 +652,8 @@ async function launchImpersonation(email) {
             phone: "+91 9876543210"
         }));
         
+        // Backup the admin token so we can restore it when exiting impersonation
+        sessionStorage.setItem('eazeevent_admin_token_backup', sessionStorage.getItem('eazeevent_token'));
         sessionStorage.setItem('eazeevent_token', data.access_token);
         
         alert(`🔑 Impersonation Mode Initialized!\n\nLaunching Customer dashboard as: ${data.name}\nRedirecting to dashboard.html...`);

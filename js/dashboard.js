@@ -1195,7 +1195,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             window.exitImpersonation = function() {
                 sessionStorage.removeItem('eazeevent_impersonating_user');
-                sessionStorage.removeItem('eazeevent_token'); // Clear impersonation token
+                
+                // Restore the admin token if it exists
+                const adminToken = sessionStorage.getItem('eazeevent_admin_token_backup');
+                if (adminToken) {
+                    sessionStorage.setItem('eazeevent_token', adminToken);
+                    sessionStorage.removeItem('eazeevent_admin_token_backup');
+                } else {
+                    sessionStorage.removeItem('eazeevent_token'); 
+                }
+                
                 window.location.href = 'admin_customers.html';
             };
         }
