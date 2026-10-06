@@ -162,10 +162,10 @@
 <span>Logout</span>
 </a>
 </div>
-<div class="mt-auto px-6 pt-6 flex items-center gap-3">
-<img alt="Admin User Profile" class="w-10 h-10 rounded-full border-2 border-surface-tint" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0rG9jLtmIZ2nikqreOXu5_8TJoVc8UjYbB-Ngt1m06xRzYQePFxOcZTILp1xEP755UE9oNh9--TQ96BzqAjdPgJNy2PaN7hn6VhRlX9DkAUPtH1Bo6jwwyKu0kAlOvC8ik_bHBoqJY1sxUkKbyZyAi7bcN0blVzzatQ-HTILYUbDCoiIRoxryUHC13wCHnrJwYagxE7HxPeePUTpfUv7zr9eSCNwdu5PfkSDMBTL8EN14qaRS5htWtVWKI8_7mPdZ5uT_YpcTog"/>
+<div class="mt-auto px-6 pt-6 flex items-center gap-3 cursor-pointer hover:bg-secondary-container/10 rounded-xl p-2 transition-colors" onclick="openAdminProfileModal()">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-sm admin-sidebar-avatar">PA</div>
 <div class="flex flex-col">
-<span class="font-body-sm text-body-sm text-on-primary font-bold">A. Sharma</span>
+<span class="font-body-sm text-body-sm text-on-primary font-bold admin-sidebar-name">Platform Administrator</span>
 <span class="font-label-xs text-label-xs text-primary-fixed-dim">System Admin</span>
 </div>
 </div>
@@ -190,7 +190,7 @@
 <button class="text-on-surface-variant hover:text-primary transition-colors" onclick="alert('No new notifications!')">
 <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
 </button>
-<button class="text-on-surface-variant hover:text-primary transition-colors" onclick="alert('Help documentation is under development!')">
+<button class="text-on-surface-variant hover:text-primary transition-colors" onclick="openHelpPanel()">
 <span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
 </button>
 <button class="ml-2 bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm text-body-sm font-medium shadow-sm hover:shadow-md transition-shadow" onclick="alert('Notice broadcast feature coming soon!')">

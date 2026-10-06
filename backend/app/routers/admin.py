@@ -9,11 +9,51 @@ from app.schemas import (
     SupportTicketOut, ActivityLogOut, ActivityLogBase, TransactionOut
 )
 from app.deps import RoleChecker
-from app.security import create_access_token
+from app.security import create_access_token, get_password_hash, verify_password
 from app.notifications import send_notification_email
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 admin_guard = RoleChecker(allowed_roles=["admin"])
+
+# --- ADMIN PROFILE ---
+class AdminProfileOut(BaseModel):
+    name: str
+    email: str
+
+class AdminProfileUpdate(BaseModel):
+    name: str
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
+
+@router.get("/profile", response_model=AdminProfileOut)
+def get_admin_profile(current_user: User = Depends(admin_guard), db: Session = Depends(get_db)):
+    return {"name": current_user.name, "email": current_user.email}
+
+@router.put("/profile", response_model=AdminProfileOut)
+def update_admin_profile(
+    payload: AdminProfileUpdate,
+    current_user: User = Depends(admin_guard),
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(User.id == current_user.id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Admin user not found.")
+
+    user.name = payload.name.strip()
+
+    if payload.new_password:
+        if not payload.current_password:
+            raise HTTPException(status_code=400, detail="Current password is required to set a new password.")
+        if not verify_password(payload.current_password, user.hashed_password):
+            raise HTTPException(status_code=400, detail="Current password is incorrect.")
+        if len(payload.new_password) < 6:
+            raise HTTPException(status_code=400, detail="New password must be at least 6 characters.")
+        user.hashed_password = get_password_hash(payload.new_password)
+
+    db.commit()
+    db.refresh(user)
+    return {"name": user.name, "email": user.email}
+
 
 @router.get("/overview", response_model=AdminOverviewStats)
 def get_admin_overview_stats(current_user: User = Depends(admin_guard), db: Session = Depends(get_db)):

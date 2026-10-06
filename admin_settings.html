@@ -172,10 +172,10 @@
 <span>Logout</span>
 </a>
 </div>
-<div class="flex items-center gap-3 px-4 pt-2">
-<img alt="Admin User Profile" class="w-8 h-8 rounded-full border border-secondary-container/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0rG9jLtmIZ2nikqreOXu5_8TJoVc8UjYbB-Ngt1m06xRzYQePFxOcZTILp1xEP755UE9oNh9--TQ96BzqAjdPgJNy2PaN7hn6VhRlX9DkAUPtH1Bo6jwwyKu0kAlOvC8ik_bHBoqJY1sxUkKbyZyAi7bcN0blVzzatQ-HTILYUbDCoiIRoxryUHC13wCHnrJwYagxE7HxPeePUTpfUv7zr9eSCNwdu5PfkSDMBTL8EN14qaRS5htWtVWKI8_7mPdZ5uT_YpcTog"/>
+<div class="flex items-center gap-3 px-4 pt-2 cursor-pointer hover:bg-secondary-container/10 rounded-xl p-2 transition-colors" onclick="openAdminProfileModal()">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-xs admin-sidebar-avatar">PA</div>
 <div class="flex flex-col">
-<span class="text-sm font-semibold text-white">A. Sharma</span>
+<span class="text-sm font-semibold text-white admin-sidebar-name">Platform Administrator</span>
 <span class="text-xs text-on-primary-fixed-variant">System Admin</span>
 </div>
 </div>
@@ -198,11 +198,11 @@
 <button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low" onclick="alert('No new notifications!')">
 <span class="material-symbols-outlined">notifications</span>
 </button>
-<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low" onclick="alert('Help documentation is under development!')">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low" onclick="openHelpPanel()">
 <span class="material-symbols-outlined">help_outline</span>
 </button>
 </div>
-<img alt="Admin Profile Avatar" class="w-8 h-8 rounded-full border border-surface-border object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDz7FV5O2b7WQdfNZlOvN8yVOlCmux76UPSPFBxhsSjBKvJIPHu0IDbuQLbvKaNDjZxXG4MdQDD7w7prs50on5rrHj1qXJC44WK2N-juKua6niRfkKgy3jhYrrITl43ok7gpJU6KbvipxzYPVjUdp-jbMGSQ466uwJeMI4cJI86ySxkDSD8bO4T_Ekxe4uaNTpjT8BCgagHBLN_MLRN9J9_11dEddEXHg2e-erqGdI4btgW_PfoEcItmnywW4cMVYl7onGxo6ueAQ"/>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-xs cursor-pointer ml-2 admin-topbar-avatar" onclick="openAdminProfileModal()">PA</div>
 </div>
 </header>
 <!-- Canvas -->

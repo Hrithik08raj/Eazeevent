@@ -146,6 +146,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             geminiApiKey: settingsData.gemini_api_key
         };
         
+        // Load real admin profile from server
+        try {
+            const profileData = await apiFetch('/api/admin/profile');
+            db_state.adminProfile = profileData;
+            // Update all sidebar name/avatar elements
+            document.querySelectorAll('.admin-sidebar-name').forEach(el => el.textContent = profileData.name);
+            document.querySelectorAll('.admin-sidebar-avatar').forEach(el => {
+                el.textContent = getInitials(profileData.name);
+            });
+            document.querySelectorAll('.admin-topbar-avatar').forEach(el => {
+                el.textContent = getInitials(profileData.name);
+            });
+        } catch(e) {
+            console.warn('Could not load admin profile:', e);
+        }
+        
         const customersData = await apiFetch('/api/admin/customers');
         db_state.customers = customersData.map(c => ({
             email: c.email,
@@ -233,6 +249,110 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 });
+
+// ============ ADMIN PROFILE MODAL ============
+
+function openAdminProfileModal() {
+    const profile = db_state.adminProfile || { name: 'Platform Administrator', email: 'admin@eazeevent.com' };
+    const modal = document.createElement('div');
+    modal.id = 'adminProfileModal';
+    modal.className = 'fixed inset-0 z-[200] bg-black/60 flex items-center justify-center';
+    modal.innerHTML = `
+        <div class="bg-white dark:bg-[#1a2e2e] rounded-2xl w-full max-w-md mx-4 p-8 shadow-2xl relative">
+            <button onclick="document.getElementById('adminProfileModal').remove()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3" id="profileModalAvatar">${getInitials(profile.name)}</div>
+                <h3 class="text-xl font-bold text-primary">Edit Admin Profile</h3>
+                <p class="text-sm text-gray-500">${profile.email}</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Display Name</label>
+                    <input id="adminProfileName" type="text" value="${escapeHtml(profile.name)}" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none text-sm" />
+                </div>
+                <hr class="border-gray-200" />
+                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Change Password (optional)</p>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Current Password</label>
+                    <input id="adminCurrentPwd" type="password" placeholder="Enter current password" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">New Password</label>
+                    <input id="adminNewPwd" type="password" placeholder="Enter new password (min 6 chars)" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none text-sm" />
+                </div>
+                <button onclick="saveAdminProfile()" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-primary/90 transition-colors mt-2">Save Changes</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function saveAdminProfile() {
+    const name = document.getElementById('adminProfileName')?.value?.trim();
+    const currentPwd = document.getElementById('adminCurrentPwd')?.value;
+    const newPwd = document.getElementById('adminNewPwd')?.value;
+    if (!name) { alert('Name cannot be empty.'); return; }
+    try {
+        const payload = { name };
+        if (newPwd) {
+            payload.current_password = currentPwd;
+            payload.new_password = newPwd;
+        }
+        const updated = await apiFetch('/api/admin/profile', { method: 'PUT', body: JSON.stringify(payload) });
+        db_state.adminProfile = updated;
+        document.querySelectorAll('.admin-sidebar-name').forEach(el => el.textContent = updated.name);
+        document.querySelectorAll('.admin-sidebar-avatar').forEach(el => el.textContent = getInitials(updated.name));
+        document.querySelectorAll('.admin-topbar-avatar').forEach(el => el.textContent = getInitials(updated.name));
+        document.getElementById('adminProfileModal')?.remove();
+        alert('Profile updated successfully!');
+    } catch(err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+// ============ HELP PANEL ============
+
+function openHelpPanel() {
+    const existing = document.getElementById('adminHelpPanel');
+    if (existing) { existing.remove(); return; }
+    const panel = document.createElement('div');
+    panel.id = 'adminHelpPanel';
+    panel.className = 'fixed top-16 right-4 z-[150] w-80 bg-white dark:bg-[#1a2e2e] rounded-2xl shadow-2xl border border-gray-200 p-5';
+    panel.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-primary text-base">Quick Help Guide</h3>
+            <button onclick="document.getElementById('adminHelpPanel').remove()" class="text-gray-400 hover:text-red-500">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+        </div>
+        <div class="space-y-3 text-sm">
+            <div class="bg-blue-50 rounded-lg p-3">
+                <p class="font-semibold text-blue-800 mb-1">Vendor Verification</p>
+                <p class="text-blue-700 text-xs">Go to Verification Queue → Review documents → Click Verify or Reject. Verified vendors can immediately log in and accept bookings.</p>
+            </div>
+            <div class="bg-green-50 rounded-lg p-3">
+                <p class="font-semibold text-green-800 mb-1">Support Tickets</p>
+                <p class="text-green-700 text-xs">Customers submit tickets from their dashboard. Reply to them here, or click Resolve Ticket to close them.</p>
+            </div>
+            <div class="bg-yellow-50 rounded-lg p-3">
+                <p class="font-semibold text-yellow-800 mb-1">Finance & Escrow</p>
+                <p class="text-yellow-700 text-xs">All payments are held in escrow. Go to Finance → Release payment to vendor after the event is complete.</p>
+            </div>
+            <div class="bg-purple-50 rounded-lg p-3">
+                <p class="font-semibold text-purple-800 mb-1">Admin Settings</p>
+                <p class="text-purple-700 text-xs">Set commission rate, Gemini AI key, SMTP credentials, and platform name from the Settings page.</p>
+            </div>
+            <div class="bg-red-50 rounded-lg p-3">
+                <p class="font-semibold text-red-800 mb-1">Admin Profile</p>
+                <p class="text-red-700 text-xs">Click your avatar/name in the sidebar or top-right to update your display name and password.</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(panel);
+}
+
 
 // ============ OVERVIEW DASHBOARD LOGIC ============
 
