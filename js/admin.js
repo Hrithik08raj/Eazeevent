@@ -1043,6 +1043,7 @@ function renderVerificationQueue() {
                 <button class="border border-surface-border text-on-surface font-body-md text-body-md py-2 px-3 rounded-lg hover:bg-surface-container-low transition-colors" onclick="reviewVendorPortfolio('${escapeHtml(v.id)}')" title="Review Profile">Review</button>
             </div>
         </div>
+        `;
     }).join('');
 }
 
